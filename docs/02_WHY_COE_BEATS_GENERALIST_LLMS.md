@@ -1,9 +1,8 @@
-# 02. Why `MCL4-COE` Demonstrates Capabilities Generalist LLMs Cannot Match
+# 02. Architectural Motivation: `MCL4-COE` vs. Standard Autoregressive LLMs
 
-A central question for any independent research lab is:
-> *"Why build a custom cognitive architecture (`MCL4-COE`) when 70B–600B generalist LLMs already exist? What meaningful, useful value does this provide that a typical generalist model cannot?"*
+Standard autoregressive language models force every cognitive operation—option comparison, relational linking, entailment verification, hypothesis ranking, and epistemic confidence estimation—through sequential next-token prediction over a large vocabulary softmax.
 
-This document answers that question with concrete mathematical and systems comparisons.
+This document compares dense autoregressive generation against `MCL4-COE`'s explicit latent operators (`COE`), shared-state cross-attention (`CED`), and bounded multi-hop Markov routing (`MCL4`).
 
 ---
 
@@ -43,9 +42,9 @@ In standard dense attention:
 2. **Softmax Dilution:** As context grows from 256 to 32,768 tokens, the denominator $\sum_{j=1}^T \exp(q_i \cdot k_j / \sqrt{d})$ sums over thousands of irrelevant tokens, drowning out sharp symbolic matches.
 
 ### The `MCL4-COE` Advantage
-In `MCL4` (proven in `mcattn` where `markov_local4` achieved **`1.1832` nats/byte vs. `1.2189` for dense attention** on matched weights and batches):
+In `MCL4` (validated in [`mcattn`](https://github.com/mESmaC/mcattn) where `markov_local4` achieved **`1.1832` nats/byte vs. `1.2189` for dense attention** on matched weights and batches):
 1. **1 Layer = 3 Graph Hops:** Within a **single** attention layer, the Markov walkers take 3 sequential transitions along the learned semantic graph (`P_q(i -> j)`), discovering multi-hop transitive links before standard QKV readout even runs.
-2. **Zero Softmax Dilution:** Because the final QKV softmax is strictly restricted to **4 local anchors + 12 highest-mass walked positions (`16` tokens total)**, `100%` of the attention probability mass is concentrated on local syntax plus the 12 most relevant multi-hop tokens.
+2. **Zero Softmax Dilution:** Because the final QKV softmax is strictly restricted to the locked local anchors plus highest-mass walked positions (`16` tokens on byte models; `24` tokens on `v7`/`v9` donor checkpoints), `100%` of the attention probability mass is concentrated on local syntax plus the most relevant multi-hop tokens.
 
 ---
 
@@ -65,9 +64,9 @@ Standard LLMs are trained strictly with cross-entropy loss to predict the next t
 
 | Capability | Typical Generalist LLM | `MCL4-COE` |
 | :--- | :--- | :--- |
-| **Attention Mechanism** | Dense $O(T^2)$ softmax (diluted across all tokens; 1 hop/layer) | **`MCL4`**: 4 local anchors + 12 multi-hop Markov walkers (0 dilution; 3 hops/layer) |
+| **Attention Mechanism** | Dense $O(T^2)$ softmax (diluted across all tokens; 1 hop/layer) | **`MCL4`**: Locked local anchors + multi-hop Markov walkers (0 dilution; 3 hops/layer) |
 | **Option / Action Selection** | Prompt-order biased text generation | **Bitwise permutation-invariant** single-softmax Pearson `Decision` head |
 | **Relational Correlation** | Forced to write prose explaining links | Native pairwise/set **`Association`** matrix in a single pass |
 | **Logical Verification** | Implicit inside verbose `<think>` monologue | Explicit **`Deduction`** (`entailed` / `contradicted` / `undetermined`) & **`Evaluation`** heads |
 | **Uncertainty / Hallucination** | Confident guessing when premises are missing | Explicit **`Metacognition`** (`evidence_sufficiency`, `correctness`, `context_benefit`) |
-| **Hardware Footprint** | Requires 24GB–80GB+ cluster GPUs | Trains & runs natively on **4GB–12GB consumer GPUs** (`CPUOffloadAdamW` + `NVFP4`) |
+| **Hardware Footprint** | Requires 24GB–80GB+ cluster GPUs | Trains & runs natively on **4GB–12GB+ GPUs** (`CPUOffloadAdamW` + `NVFP4`) |
