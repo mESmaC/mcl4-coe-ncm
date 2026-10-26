@@ -6,6 +6,33 @@ Instead of forcing a monolithic dense transformer to serialize every thought, co
 
 ---
 
+## Pretrained Checkpoints on Hugging Face (`Safetensors`)
+
+| Checkpoint | Base Donor & Topology | NCM Hierarchy | Hugging Face Repository |
+| :--- | :--- | :--- | :--- |
+| **`MCL4-COE-v9-Llama-3.2-1B-NCM-Mitosis-R2`** (`Step 10,000`) | `meta-llama/Llama-3.2-1B` upcycled via 2 rounds of Sliced-Dense NVFP4 MoE Mitosis (`E=16, top_k=8`) + 9-Operator `COE` | `4` levels ($\ell_k \in [1, 8, 29, 64]$, $V_k = 1024$) | **[`mesmac/MCL4-COE-v9-Llama-3.2-1B-NCM-Mitosis-R2`](https://huggingface.co/mesmac/MCL4-COE-v9-Llama-3.2-1B-NCM-Mitosis-R2)** |
+| **`MCL4-COE-v7-Granite-3.1-1B-NCM-MoE`** (`Step 9,000`) | `ibm-granite/granite-3.1-1b-a400m-instruct` (`E=40, top_k=8` NVFP4) + 9-Operator `COE` | `6` levels ($\ell_k \in [1, 4, 11, 24, 41, 64]$, $V_k = 1024$) | **[`mesmac/MCL4-COE-v7-Granite-3.1-1B-NCM-MoE`](https://huggingface.co/mesmac/MCL4-COE-v7-Granite-3.1-1B-NCM-MoE)** |
+
+### Quickstart: Loading Checkpoints from Hugging Face
+
+```bash
+pip install safetensors huggingface_hub "git+https://github.com/mESmaC/mcl4-coe-ncm.git"
+```
+
+```python
+import torch
+from mcl4_coe import load_pretrained_mcl4_coe_ncm
+
+model = load_pretrained_mcl4_coe_ncm(
+    "mesmac/MCL4-COE-v9-Llama-3.2-1B-NCM-Mitosis-R2",
+    device="cuda" if torch.cuda.is_available() else "cpu",
+    dtype="bfloat16",
+)
+print("Loaded MoE experts:", model.backbone.config.num_experts, "| NCM levels:", model.ncm_system.levels)
+```
+
+---
+
 ## Key Empirical Results on This Branch (`ncm`)
 
 ### 1. Grafting Next-Concept Modeling (`NCM`) + Single-Softmax `COE` onto Pretrained Donors (`Llama-3.2-1B` & `Granite 3.1`)
