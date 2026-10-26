@@ -1,0 +1,506 @@
+{
+  "checkpoint": "runs/colab_mcl4_coe_v9_llama32_1b_dense_ncm_rl/checkpoints/step_10000.pt",
+  "step": 10000,
+  "architecture": "MCL4-COE v9 Llama-3.2-1B-Dense (E=16, top_k=8 NVFP4 + NCM, Mitosis Round 2)",
+  "mitotic_state": {
+    "num_experts": 16,
+    "top_k": 8,
+    "mitotic_pairs": [
+      [0, 8],
+      [1, 9],
+      [2, 10],
+      [3, 11],
+      [4, 12],
+      [5, 13],
+      [6, 14],
+      [7, 15]
+    ],
+    "active_plastic_pairs": [
+      [4, 12],
+      [5, 13],
+      [6, 14],
+      [7, 15]
+    ],
+    "released_mitotic_pairs": [
+      [0, 8],
+      [1, 9],
+      [2, 10],
+      [3, 11]
+    ],
+    "frozen_experts": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "plastic_experts": [12, 13, 14, 15],
+    "round1_clones_rel_l2_raw": 0.015354,
+    "round2_clones_rel_l2_raw": 0.01871,
+    "warmup_datasets": [
+      "granite_llama128k",
+      "Vyber07/cyber-security",
+      "sunblaze-ucb/cybergym"
+    ],
+    "rlvr_families_count": 64,
+    "dream_accepted_revisions": 137,
+    "dream_replays_dreamed": 9041760,
+    "cumulative_tokens": 26533048
+  },
+  "held_out_validation": {
+    "step_10000_raw_uncalibrated": {
+      "val_bpb": 0.9325,
+      "val_bpb_pretrain_lm": 1.2286,
+      "val_bpb_uta_trace": 0.9049,
+      "val_bpb_typed_decision": 0.6922,
+      "val_mcqa_acc": 0.4297,
+      "val_mcqa_dec_acc": 0.4062,
+      "val_mcqa_5op_acc": 0.3672,
+      "val_mcqa_ce_loss": 1.4046,
+      "val_mcqa_n": 128
+    },
+    "step_10000_calibrated_r1_030_r2_100_ad_005": {
+      "val_bpb": 0.8836,
+      "val_bpb_pretrain_lm": 1.116,
+      "val_bpb_uta_trace": 0.9039,
+      "val_bpb_typed_decision": 0.6455,
+      "val_mcqa_acc": 0.6328,
+      "val_mcqa_dec_acc": 0.6328,
+      "val_mcqa_5op_acc": 0.5781,
+      "val_mcqa_ce_loss": 1.1365,
+      "val_mcqa_n": 128
+    },
+    "step_10000_calibrated_r1_030_r2_045_ad_005": {
+      "val_loss_pretrain_lm": 3.0953,
+      "val_bpt_pretrain_lm": 4.4656,
+      "val_bpb_pretrain_lm": 1.0788,
+      "val_loss_uta_trace": 2.7672,
+      "val_bpt_uta_trace": 3.9922,
+      "val_bpb_uta_trace": 0.8926,
+      "val_loss_typed_decision": 2.0665,
+      "val_bpt_typed_decision": 2.9814,
+      "val_bpb_typed_decision": 0.6477,
+      "val_lm_loss": 2.6548,
+      "val_bpt": 3.8301,
+      "val_bpb": 0.869,
+      "val_tokens_evaluated": 21610.0,
+      "val_bytes_evaluated": 95245.0,
+      "val_mcqa_acc": 0.5859,
+      "val_mcqa_5op_acc": 0.5859,
+      "val_mcqa_dec_acc": 0.5703,
+      "val_mcqa_ce_loss": 1.1756,
+      "val_mcqa_n": 128.0
+    }
+  },
+  "external_12_suite_benchmarks": {
+    "step_10000_calibrated_r1_030_r2_100_ad_005": {
+      "ARC-Challenge (N=300, 4-way)": {
+        "acc": 33.0,
+        "acc_norm": 33.67,
+        "coe_decision_acc": 49.0,
+        "coe_multi_op_acc": 47.67,
+        "coe_adaptive_acc": 47.67,
+        "coe_full_ens_acc": 48.0
+      },
+      "MMLU_57Subj (N=342, 4-way)": {
+        "acc": 30.99,
+        "acc_norm": 37.13,
+        "coe_decision_acc": 44.15,
+        "coe_multi_op_acc": 44.74,
+        "coe_adaptive_acc": 45.91,
+        "coe_full_ens_acc": 45.03
+      },
+      "HellaSwag (N=300, 4-way)": {
+        "acc": 43.0,
+        "acc_norm": 51.67,
+        "coe_decision_acc": 45.0,
+        "coe_multi_op_acc": 44.67,
+        "coe_adaptive_acc": 44.67,
+        "coe_full_ens_acc": 44.33
+      },
+      "OpenBookQA_MultiHop_Science (N=500, 4-way)": {
+        "acc": 28.4,
+        "acc_norm": 38.2,
+        "coe_decision_acc": 58.4,
+        "coe_multi_op_acc": 58.0,
+        "coe_adaptive_acc": 58.2,
+        "coe_full_ens_acc": 58.2
+      },
+      "MuSR_Murder_Mysteries (N=250, 2-way)": {
+        "acc": 53.6,
+        "acc_norm": 52.0,
+        "coe_decision_acc": 54.8,
+        "coe_multi_op_acc": 54.8,
+        "coe_adaptive_acc": 54.8,
+        "coe_full_ens_acc": 54.8
+      },
+      "MuSR_Object_Placements (N=256, 5-way)": {
+        "acc": 33.98,
+        "acc_norm": 26.95,
+        "coe_decision_acc": 33.98,
+        "coe_multi_op_acc": 34.38,
+        "coe_adaptive_acc": 33.2,
+        "coe_full_ens_acc": 33.98
+      },
+      "MuSR_Team_Allocation (N=250, 3-way)": {
+        "acc": 32.0,
+        "acc_norm": 32.0,
+        "coe_decision_acc": 34.8,
+        "coe_multi_op_acc": 34.4,
+        "coe_adaptive_acc": 34.8,
+        "coe_full_ens_acc": 35.2
+      },
+      "BBH_Logical_Deduction_3Obj (N=250, 3-way)": {
+        "acc": 39.6,
+        "acc_norm": 38.0,
+        "coe_decision_acc": 41.2,
+        "coe_multi_op_acc": 41.2,
+        "coe_adaptive_acc": 41.2,
+        "coe_full_ens_acc": 40.8
+      },
+      "BBH_Logical_Deduction_5Obj (N=250, 5-way)": {
+        "acc": 27.2,
+        "acc_norm": 26.4,
+        "coe_decision_acc": 26.8,
+        "coe_multi_op_acc": 28.4,
+        "coe_adaptive_acc": 28.0,
+        "coe_full_ens_acc": 27.6
+      },
+      "BBH_Tracking_Shuffled_Objects (N=250, 3-way)": {
+        "acc": 29.2,
+        "acc_norm": 34.4,
+        "coe_decision_acc": 34.8,
+        "coe_multi_op_acc": 35.2,
+        "coe_adaptive_acc": 35.6,
+        "coe_full_ens_acc": 35.2
+      },
+      "BBH_Web_of_Lies (N=250, 2-way)": {
+        "acc": 41.6,
+        "acc_norm": 47.2,
+        "coe_decision_acc": 48.0,
+        "coe_multi_op_acc": 48.0,
+        "coe_adaptive_acc": 45.2,
+        "coe_full_ens_acc": 45.2
+      },
+      "BBH_Formal_Fallacies (N=250, 2-way)": {
+        "acc": 46.8,
+        "acc_norm": 46.8,
+        "coe_decision_acc": 46.8,
+        "coe_multi_op_acc": 46.8,
+        "coe_adaptive_acc": 46.8,
+        "coe_full_ens_acc": 46.8
+      }
+    },
+    "step_10000_calibrated_r1_030_r2_045_ad_005": {
+      "MMLU_57Subj (N=342, 4-way)": {
+        "acc": 30.41,
+        "acc_norm": 35.67,
+        "coe_decision_acc": 47.37,
+        "coe_multi_op_acc": 46.78,
+        "coe_adaptive_acc": 46.49,
+        "coe_full_ens_acc": 46.49
+      },
+      "OpenBookQA_MultiHop_Science (N=500, 4-way)": {
+        "acc": 28.0,
+        "acc_norm": 37.8,
+        "coe_decision_acc": 59.8,
+        "coe_multi_op_acc": 59.8,
+        "coe_adaptive_acc": 59.0,
+        "coe_full_ens_acc": 59.0
+      },
+      "MuSR_Team_Allocation (N=250, 3-way)": {
+        "acc": 32.4,
+        "acc_norm": 32.4,
+        "coe_decision_acc": 38.0,
+        "coe_multi_op_acc": 38.0,
+        "coe_adaptive_acc": 37.6,
+        "coe_full_ens_acc": 37.2
+      },
+      "BBH_Logical_Deduction_5Obj (N=250, 5-way)": {
+        "acc": 26.4,
+        "acc_norm": 26.4,
+        "coe_decision_acc": 26.4,
+        "coe_multi_op_acc": 26.4,
+        "coe_adaptive_acc": 26.8,
+        "coe_full_ens_acc": 26.4
+      },
+      "BBH_Tracking_Shuffled_Objects (N=250, 3-way)": {
+        "acc": 32.0,
+        "acc_norm": 32.0,
+        "coe_decision_acc": 30.8,
+        "coe_multi_op_acc": 30.4,
+        "coe_adaptive_acc": 30.4,
+        "coe_full_ens_acc": 30.4
+      },
+      "BBH_Web_of_Lies (N=250, 2-way)": {
+        "acc": 48.0,
+        "acc_norm": 49.6,
+        "coe_decision_acc": 51.2,
+        "coe_multi_op_acc": 51.2,
+        "coe_adaptive_acc": 50.4,
+        "coe_full_ens_acc": 50.4
+      },
+      "ARC-Challenge (N=300, 4-way)": {
+        "acc": 30.67,
+        "acc_norm": 32.0,
+        "coe_decision_acc": 46.67,
+        "coe_multi_op_acc": 46.67,
+        "coe_adaptive_acc": 46.0,
+        "coe_full_ens_acc": 46.0
+      },
+      "HellaSwag (N=300, 4-way)": {
+        "acc": 43.33,
+        "acc_norm": 49.67,
+        "coe_decision_acc": 42.0,
+        "coe_multi_op_acc": 42.33,
+        "coe_adaptive_acc": 45.33,
+        "coe_full_ens_acc": 44.33
+      },
+      "MuSR_Murder_Mysteries (N=250, 2-way)": {
+        "acc": 53.6,
+        "acc_norm": 52.0,
+        "coe_decision_acc": 52.8,
+        "coe_multi_op_acc": 52.8,
+        "coe_adaptive_acc": 52.8,
+        "coe_full_ens_acc": 52.8
+      },
+      "MuSR_Object_Placements (N=256, 5-way)": {
+        "acc": 37.89,
+        "acc_norm": 25.39,
+        "coe_decision_acc": 33.2,
+        "coe_multi_op_acc": 33.59,
+        "coe_adaptive_acc": 34.38,
+        "coe_full_ens_acc": 34.38
+      },
+      "BBH_Logical_Deduction_3Obj (N=250, 3-way)": {
+        "acc": 38.8,
+        "acc_norm": 39.2,
+        "coe_decision_acc": 37.6,
+        "coe_multi_op_acc": 37.6,
+        "coe_adaptive_acc": 37.6,
+        "coe_full_ens_acc": 37.6
+      },
+      "BBH_Formal_Fallacies (N=250, 2-way)": {
+        "acc": 46.8,
+        "acc_norm": 46.8,
+        "coe_decision_acc": 46.8,
+        "coe_multi_op_acc": 46.8,
+        "coe_adaptive_acc": 46.8,
+        "coe_full_ens_acc": 46.8
+      }
+    }
+  },
+  "round2_rlvr_64_family_summary": {
+    "total_pure_rl_steps": 1600,
+    "unique_families_trained": 63,
+    "overall_verify_pass_rate": 0.6126,
+    "new_families": {
+      "computer_use.gui_dom_accessibility_tree": {
+        "steps": 48,
+        "avg_pass_rate": 0.8611,
+        "last_pass_rate": 0.8884,
+        "max_recursion_depth": 13,
+        "max_star_difficulty": 20.29,
+        "raw_pp_gained": 153884.5
+      },
+      "cybergym.vuln_sanitizer_root_cause_patch": {
+        "steps": 46,
+        "avg_pass_rate": 0.857,
+        "last_pass_rate": 0.8907,
+        "max_recursion_depth": 11,
+        "max_star_difficulty": 16.27,
+        "raw_pp_gained": 90254.0
+      },
+      "cybersec.ptes_owasp_attack_graph_mitigation": {
+        "steps": 119,
+        "avg_pass_rate": 0.4924,
+        "last_pass_rate": 0.4071,
+        "max_recursion_depth": 35,
+        "max_star_difficulty": 59.81,
+        "raw_pp_gained": 23096.5
+      },
+      "leetcode.backtracking_subset_constraint_pruning": {
+        "steps": 45,
+        "avg_pass_rate": 0.8396,
+        "last_pass_rate": 0.8881,
+        "max_recursion_depth": 12,
+        "max_star_difficulty": 18.25,
+        "raw_pp_gained": 104505.3
+      },
+      "leetcode.divide_and_conquer_tree_recurrence": {
+        "steps": 55,
+        "avg_pass_rate": 0.8081,
+        "last_pass_rate": 0.8919,
+        "max_recursion_depth": 13,
+        "max_star_difficulty": 20.29,
+        "raw_pp_gained": 121358.2
+      },
+      "leetcode.grandmaster_recursive_hybrid_synthesis": {
+        "steps": 40,
+        "avg_pass_rate": 0.8482,
+        "last_pass_rate": 0.8897,
+        "max_recursion_depth": 11,
+        "max_star_difficulty": 16.27,
+        "raw_pp_gained": 85754.5
+      },
+      "leetcode.graph_dfs_dag_topological_longest_path": {
+        "steps": 57,
+        "avg_pass_rate": 0.7633,
+        "last_pass_rate": 0.8901,
+        "max_recursion_depth": 10,
+        "max_star_difficulty": 14.35,
+        "raw_pp_gained": 78241.3
+      },
+      "leetcode.monotonic_window_subarray_optimization": {
+        "steps": 44,
+        "avg_pass_rate": 0.8641,
+        "last_pass_rate": 0.8966,
+        "max_recursion_depth": 17,
+        "max_star_difficulty": 28.94,
+        "raw_pp_gained": 210947.9
+      },
+      "leetcode.parametric_binary_search_on_answer": {
+        "steps": 47,
+        "avg_pass_rate": 0.8746,
+        "last_pass_rate": 0.9048,
+        "max_recursion_depth": 14,
+        "max_star_difficulty": 22.37,
+        "raw_pp_gained": 201806.8
+      },
+      "leetcode.recursive_dp_memoization": {
+        "steps": 45,
+        "avg_pass_rate": 0.8337,
+        "last_pass_rate": 0.8816,
+        "max_recursion_depth": 48,
+        "max_star_difficulty": 119.23,
+        "raw_pp_gained": 492709.3
+      },
+      "leetcode.tree_postorder_robber_interval_dp": {
+        "steps": 57,
+        "avg_pass_rate": 0.7283,
+        "last_pass_rate": 0.8946,
+        "max_recursion_depth": 8,
+        "max_star_difficulty": 10.68,
+        "raw_pp_gained": 37229.6
+      },
+      "terminal.posix_pipeline_state_machine": {
+        "steps": 41,
+        "avg_pass_rate": 0.8627,
+        "last_pass_rate": 0.89,
+        "max_recursion_depth": 44,
+        "max_star_difficulty": 105.58,
+        "raw_pp_gained": 312305.2
+      },
+      "tool_use.multi_hop_schema_dag": {
+        "steps": 49,
+        "avg_pass_rate": 0.8241,
+        "last_pass_rate": 0.8832,
+        "max_recursion_depth": 12,
+        "max_star_difficulty": 18.25,
+        "raw_pp_gained": 88936.4
+      }
+    }
+  },
+  "frontier_agent_benchmarks_step_10000": {
+    "canonical_bpb": {
+      "terminal_bench_2_1_solve_sh_bpb_n89": 0.9187,
+      "agents_last_exam_v1_1_verifier_py_bpb_n122": 0.8607
+    },
+    "terminal_bench_2_1": {
+      "Solution_Synthesis_All (N=89, 4-way)": {
+        "acc": 33.71,
+        "acc_norm": 33.71,
+        "coe_decision_acc": 30.34,
+        "coe_multi_op_acc": 30.34,
+        "coe_adaptive_acc": 31.46,
+        "coe_full_ens_acc": 31.46
+      },
+      "Verification_Suite_All (N=89, 4-way)": {
+        "acc": 32.58,
+        "acc_norm": 24.72,
+        "coe_decision_acc": 24.72,
+        "coe_multi_op_acc": 24.72,
+        "coe_adaptive_acc": 25.84,
+        "coe_full_ens_acc": 24.72
+      },
+      "Easy_Split (N=4, 4-way)": {
+        "acc": 50.0,
+        "acc_norm": 75.0,
+        "coe_decision_acc": 25.0,
+        "coe_multi_op_acc": 25.0,
+        "coe_adaptive_acc": 25.0,
+        "coe_full_ens_acc": 25.0
+      },
+      "Medium_Split (N=55, 4-way)": {
+        "acc": 38.18,
+        "acc_norm": 38.18,
+        "coe_decision_acc": 23.64,
+        "coe_multi_op_acc": 23.64,
+        "coe_adaptive_acc": 25.45,
+        "coe_full_ens_acc": 25.45
+      },
+      "Hard_Split (N=30, 4-way)": {
+        "acc": 26.67,
+        "acc_norm": 26.67,
+        "coe_decision_acc": 36.67,
+        "coe_multi_op_acc": 36.67,
+        "coe_adaptive_acc": 36.67,
+        "coe_full_ens_acc": 36.67
+      },
+      "by_domain": {
+        "debugging (N=5)": {"acc": 60.0, "acc_norm": 60.0, "coe_decision_acc": 60.0, "coe_multi_op_acc": 60.0, "coe_adaptive_acc": 60.0, "coe_full_ens_acc": 60.0},
+        "scientific-computing (N=8)": {"acc": 25.0, "acc_norm": 25.0, "coe_decision_acc": 37.5, "coe_multi_op_acc": 37.5, "coe_adaptive_acc": 50.0, "coe_full_ens_acc": 37.5},
+        "system-administration (N=9)": {"acc": 44.44, "acc_norm": 44.44, "coe_decision_acc": 33.33, "coe_multi_op_acc": 33.33, "coe_adaptive_acc": 33.33, "coe_full_ens_acc": 33.33},
+        "software-engineering (N=26)": {"acc": 38.46, "acc_norm": 42.31, "coe_decision_acc": 26.92, "coe_multi_op_acc": 26.92, "coe_adaptive_acc": 26.92, "coe_full_ens_acc": 26.92},
+        "security (N=8)": {"acc": 37.5, "acc_norm": 37.5, "coe_decision_acc": 37.5, "coe_multi_op_acc": 37.5, "coe_adaptive_acc": 37.5, "coe_full_ens_acc": 37.5},
+        "data-science (N=8)": {"acc": 25.0, "acc_norm": 12.5, "coe_decision_acc": 37.5, "coe_multi_op_acc": 37.5, "coe_adaptive_acc": 25.0, "coe_full_ens_acc": 37.5},
+        "file-operations (N=5)": {"acc": 0.0, "acc_norm": 0.0, "coe_decision_acc": 20.0, "coe_multi_op_acc": 20.0, "coe_adaptive_acc": 20.0, "coe_full_ens_acc": 20.0}
+      }
+    },
+    "agents_last_exam_v1_1": {
+      "Workflow_All (N=122, 4-way)": {
+        "acc": 51.64,
+        "acc_norm": 50.82,
+        "coe_decision_acc": 39.34,
+        "coe_multi_op_acc": 39.34,
+        "coe_adaptive_acc": 40.16,
+        "coe_full_ens_acc": 38.52
+      },
+      "Verifier_All (N=122, 4-way)": {
+        "acc": 27.05,
+        "acc_norm": 27.05,
+        "coe_decision_acc": 21.31,
+        "coe_multi_op_acc": 21.31,
+        "coe_adaptive_acc": 22.13,
+        "coe_full_ens_acc": 21.31
+      },
+      "Split_NearTerm (N=45, 4-way)": {
+        "acc": 51.11,
+        "acc_norm": 48.89,
+        "coe_decision_acc": 37.78,
+        "coe_multi_op_acc": 37.78,
+        "coe_adaptive_acc": 40.0,
+        "coe_full_ens_acc": 35.56
+      },
+      "Split_FullSpectrum (N=41, 4-way)": {
+        "acc": 58.54,
+        "acc_norm": 58.54,
+        "coe_decision_acc": 46.34,
+        "coe_multi_op_acc": 46.34,
+        "coe_adaptive_acc": 46.34,
+        "coe_full_ens_acc": 46.34
+      },
+      "Split_LastExam (N=36, 4-way)": {
+        "acc": 47.22,
+        "acc_norm": 47.22,
+        "coe_decision_acc": 30.56,
+        "coe_multi_op_acc": 30.56,
+        "coe_adaptive_acc": 30.56,
+        "coe_full_ens_acc": 30.56
+      },
+      "by_domain": {
+        "visual_media (N=11)": {"acc": 81.82, "acc_norm": 81.82, "coe_decision_acc": 72.73, "coe_multi_op_acc": 72.73, "coe_adaptive_acc": 63.64, "coe_full_ens_acc": 63.64},
+        "engineering (N=16)": {"acc": 62.5, "acc_norm": 62.5, "coe_decision_acc": 56.25, "coe_multi_op_acc": 56.25, "coe_adaptive_acc": 56.25, "coe_full_ens_acc": 56.25},
+        "health_medicine (N=19)": {"acc": 57.89, "acc_norm": 57.89, "coe_decision_acc": 26.32, "coe_multi_op_acc": 26.32, "coe_adaptive_acc": 31.58, "coe_full_ens_acc": 26.32},
+        "physical_sciences (N=14)": {"acc": 57.14, "acc_norm": 57.14, "coe_decision_acc": 28.57, "coe_multi_op_acc": 28.57, "coe_adaptive_acc": 28.57, "coe_full_ens_acc": 28.57},
+        "business_finance (N=19)": {"acc": 52.63, "acc_norm": 52.63, "coe_decision_acc": 42.11, "coe_multi_op_acc": 42.11, "coe_adaptive_acc": 42.11, "coe_full_ens_acc": 42.11},
+        "life_sciences (N=12)": {"acc": 33.33, "acc_norm": 33.33, "coe_decision_acc": 25.0, "coe_multi_op_acc": 25.0, "coe_adaptive_acc": 16.67, "coe_full_ens_acc": 16.67},
+        "computing_math (N=19)": {"acc": 26.32, "acc_norm": 21.05, "coe_decision_acc": 21.05, "coe_multi_op_acc": 21.05, "coe_adaptive_acc": 26.32, "coe_full_ens_acc": 21.05}
+      }
+    }
+  }
+}

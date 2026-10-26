@@ -1,0 +1,45 @@
+{
+  "architecture": "MCL4-JIT (Qwen3.8-Flash-Next-NVFP4 180B + MCL4-COE/NCM + Mitotic Binary Compiler)",
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Server Edition (101.97 GB VRAM, SM120 Native F.scaled_mm float4_e2m1fn_x2)",
+  "donor_checkpoint": "nvidia/Qwen3.8-Flash-Next-NVFP4",
+  "quantization_compatibility": {
+    "native_blackwell_scaled_mm": true,
+    "requantization_needed": false,
+    "fp4_kernel_vs_dequant_cosine_sim": 0.99999416,
+    "nvfp4_vs_bf16_act_cosine_sim": 0.995443,
+    "recompiled_mitotic_nvfp4_vs_orig_cosine_sim": 0.998914
+  },
+  "memory_footprint_48_layers": {
+    "total_model_parameters_b": 180.0,
+    "routed_moe_experts_total": 24576,
+    "single_expert_nvfp4_shard_mib": 2.64,
+    "unloaded_nvfp4_expert_store_disk_gib": 63.36,
+    "pinned_bf16_computation_core_vram_gib": 9.2,
+    "mounted_working_set_experts_count": 8486,
+    "mounted_working_set_experts_pct": 34.53,
+    "mounted_working_set_cache_vram_gib": 21.85,
+    "trainable_plastic_graft_parameters": 41152003,
+    "trainable_plastic_graft_mib": 78.49,
+    "peak_48_layer_rl_training_vram_gib": 38.02,
+    "vram_utilization_pct_of_102gb": 37.29
+  },
+  "jit_streaming_and_compiler_metrics": {
+    "mmap_to_gpu_expert_mount_latency_us": 340.4,
+    "effective_jit_streaming_bandwidth_gbps": 7.76,
+    "warm_working_set_cache_hit_rate_pct": 99.6,
+    "mitotic_clone_to_nvfp4_binary_compile_ms_per_expert": 2.41,
+    "post_compile_full_vocab_logit_cosine_sim": 0.994533,
+    "post_compile_top1_token_agreement_pct": 91.41
+  },
+  "rl_rsi_throughput_48_layers_256_tokens": {
+    "full_48_layer_every_step_time_s": 7.62,
+    "full_48_layer_every_step_tok_per_s": 33.6,
+    "stem_47_layer_emit_once_time_s": 7.4,
+    "plastic_top_layer_update_ms": 156.21,
+    "plastic_top_layer_tok_per_s": 1638.8,
+    "amortized_grpo_g8_step_time_s": 1.08,
+    "amortized_grpo_g8_tok_per_s": 236.7,
+    "time_per_1000_rl_updates_hours_unamortized": 2.12,
+    "time_per_1000_rl_updates_hours_grpo_g8": 0.3
+  }
+}
