@@ -1,0 +1,18 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00004.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938498.4826312,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 225,
+  "num_tokens": 8388609,
+  "provenance": [],
+  "receipt_file": "pretrain_lm_train_shard_00004.receipt.json",
+  "seq_len": 2048,
+  "sha256": "c54440a9495a3337e635aab04525ecddb2b11e7e72e0d0911bf8298ce1c6cf0e",
+  "shard_id": "pretrain_lm_train_shard_00004",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}

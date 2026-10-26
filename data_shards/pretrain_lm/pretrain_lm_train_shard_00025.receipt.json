@@ -1,0 +1,27 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00025.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938527.5694792,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 1300,
+  "num_tokens": 8388609,
+  "provenance": [
+    {
+      "corpus": "text/open-us-law",
+      "episodes_accepted": 529,
+      "episodes_rejected_stage0": 3,
+      "row_end": 532,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\open-us-law\\us_ak_ag_opinion.parquet"
+    }
+  ],
+  "receipt_file": "pretrain_lm_train_shard_00025.receipt.json",
+  "seq_len": 2048,
+  "sha256": "5b8587909f573e9934139e5cd5a44f9b330b2ef4f4e0ea48a4b25ca8782ab7ad",
+  "shard_id": "pretrain_lm_train_shard_00025",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}

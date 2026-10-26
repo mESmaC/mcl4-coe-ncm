@@ -1,0 +1,27 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00027.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938531.8057036,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 858,
+  "num_tokens": 8388609,
+  "provenance": [
+    {
+      "corpus": "text/wikipedia-en",
+      "episodes_accepted": 1219,
+      "episodes_rejected_stage0": 781,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\wikipedia-en\\20231101.en\\train-00000-of-00041.parquet"
+    }
+  ],
+  "receipt_file": "pretrain_lm_train_shard_00027.receipt.json",
+  "seq_len": 2048,
+  "sha256": "1643652c9ff0c40ba2579beedc8649602989d67a266efaabc86398c2f1551e0f",
+  "shard_id": "pretrain_lm_train_shard_00027",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}

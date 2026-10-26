@@ -1,0 +1,43 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00022.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938523.8527043,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 1904,
+  "num_tokens": 8388609,
+  "provenance": [
+    {
+      "corpus": "text/Nemotron-CC-Math-v1",
+      "episodes_accepted": 1877,
+      "episodes_rejected_stage0": 123,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-CC-Math-v1\\3\\part_000001.parquet"
+    },
+    {
+      "corpus": "text/Nemotron-Pretraining-Code-v3",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 2000,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Pretraining-Code-v3\\Nemotron-Code-Metadata\\part_00000.parquet"
+    },
+    {
+      "corpus": "text/Nemotron-Pretraining-Code-v3",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 2000,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Pretraining-Code-v3\\Nemotron-Code-Metadata\\part_00001.parquet"
+    }
+  ],
+  "receipt_file": "pretrain_lm_train_shard_00022.receipt.json",
+  "seq_len": 2048,
+  "sha256": "0e16a2245e4e960a0e95cd1a1e500fc5eadb3c591574c5c746186d4dab0fac66",
+  "shard_id": "pretrain_lm_train_shard_00022",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}

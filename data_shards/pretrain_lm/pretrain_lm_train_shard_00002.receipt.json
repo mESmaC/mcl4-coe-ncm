@@ -1,0 +1,27 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00002.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938496.5936005,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 774,
+  "num_tokens": 8388609,
+  "provenance": [
+    {
+      "corpus": "text/arxiv_cplusplus_research_code",
+      "episodes_accepted": 1555,
+      "episodes_rejected_stage0": 445,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\arxiv_cplusplus_research_code\\data\\train-00001-of-00044-a2179eee258043f1.parquet"
+    }
+  ],
+  "receipt_file": "pretrain_lm_train_shard_00002.receipt.json",
+  "seq_len": 2048,
+  "sha256": "d291bf08337d8298e12a22ef675db3fd4cbeeec0005f9aa3bb6962ba39712fb6",
+  "shard_id": "pretrain_lm_train_shard_00002",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}

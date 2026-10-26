@@ -1,0 +1,27 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00023.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938524.9012556,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 3612,
+  "num_tokens": 8388609,
+  "provenance": [
+    {
+      "corpus": "text/Nemotron-Pretraining-Legal-v1",
+      "episodes_accepted": 1948,
+      "episodes_rejected_stage0": 52,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Pretraining-Legal-v1\\Nemotron-Pretraining-Legal-California-Code-Of-Regulations\\part_000000.parquet"
+    }
+  ],
+  "receipt_file": "pretrain_lm_train_shard_00023.receipt.json",
+  "seq_len": 2048,
+  "sha256": "6eec0b10a1171414c29ac564cdb2ee367a408697c35a3260761bd8561fa8cc2f",
+  "shard_id": "pretrain_lm_train_shard_00023",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}

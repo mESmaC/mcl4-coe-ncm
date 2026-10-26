@@ -1,0 +1,400 @@
+{
+  "byte_order": "little",
+  "completed_source_files": [],
+  "dtype": "uint16",
+  "excluded_corpora": [
+    "tinystories"
+  ],
+  "format_version": 1,
+  "max_tokens_per_shard": 8388608,
+  "pipeline": "mcl4_coe_sharded_v1",
+  "seq_len": 2048,
+  "shards": [
+    {
+      "bin_file": "uta_trace_train_shard_00000.bin",
+      "byte_order": "little",
+      "created_at_unix": 1791938513.7380843,
+      "dtype": "uint16",
+      "num_blocks": 4096,
+      "num_bytes": 16777218,
+      "num_episodes": 22525,
+      "num_tokens": 8388609,
+      "provenance": [
+        {
+          "corpus": "chat/AM-DeepSeek-R1-Distilled-1.4M",
+          "episodes_accepted": 4,
+          "episodes_rejected_stage0": 1996,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\AM-DeepSeek-R1-Distilled-1.4M\\am_0.5M.jsonl"
+        },
+        {
+          "corpus": "chat/AM-DeepSeek-R1-Distilled-1.4M",
+          "episodes_accepted": 79,
+          "episodes_rejected_stage0": 1921,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\AM-DeepSeek-R1-Distilled-1.4M\\am_0.9M.jsonl"
+        },
+        {
+          "corpus": "chat/amazon-c11-distillation-filtered",
+          "episodes_accepted": 7927,
+          "episodes_rejected_stage0": 818,
+          "row_end": 818,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\amazon-c11-distillation-filtered\\datasets\\latent-state-best32-norm-tr\\combined\\test\\part-101.parquet"
+        },
+        {
+          "corpus": "chat/amazon-c11-distillation-filtered",
+          "episodes_accepted": 7727,
+          "episodes_rejected_stage0": 848,
+          "row_end": 848,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\amazon-c11-distillation-filtered\\datasets\\latent-state-best32-norm-tr\\combined\\train\\part-000.parquet"
+        },
+        {
+          "corpus": "chat/DeepSeek-V4-Distill-8000x",
+          "episodes_accepted": 271,
+          "episodes_rejected_stage0": 1729,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\DeepSeek-V4-Distill-8000x\\data\\train.jsonl"
+        },
+        {
+          "corpus": "chat/DeepSeek-V4-Distill-8000x",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 1,
+          "row_end": 57,
+          "row_start": 57,
+          "source_file": "X:\\corpora\\chat\\DeepSeek-V4-Distill-8000x\\stats.json"
+        },
+        {
+          "corpus": "chat/fable_5_distillation_merged_cleaned_25k",
+          "episodes_accepted": 1313,
+          "episodes_rejected_stage0": 687,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\fable_5_distillation_merged_cleaned_25k\\fable5_distillation_merged_cleaned.jsonl"
+        },
+        {
+          "corpus": "chat/GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset",
+          "episodes_accepted": 2000,
+          "episodes_rejected_stage0": 0,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset\\data\\applied\\earth_climate_25k\\shard-00000.jsonl"
+        },
+        {
+          "corpus": "chat/GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset",
+          "episodes_accepted": 2000,
+          "episodes_rejected_stage0": 0,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset\\data\\applied\\earth_climate_25k\\shard-00001.jsonl"
+        },
+        {
+          "corpus": "chat/Mega-Brain-Distill",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 2000,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\Mega-Brain-Distill\\data\\0xSero__kimi-k2.6-reap-observations-v1.parquet"
+        },
+        {
+          "corpus": "chat/Mega-Brain-Distill",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 500,
+          "row_end": 500,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\Mega-Brain-Distill\\data\\11-47__claude_opus_4.8_distill_5k.parquet"
+        }
+      ],
+      "receipt_file": "uta_trace_train_shard_00000.receipt.json",
+      "seq_len": 2048,
+      "sha256": "2e0f56543913599dfb1ecc8b8c7403e1b8deec72b31e551c772e1afa6855e52f",
+      "shard_id": "uta_trace_train_shard_00000",
+      "split": "train",
+      "track": "uta_trace",
+      "unmasked_target_tokens": 4240991
+    },
+    {
+      "bin_file": "uta_trace_train_shard_00001.bin",
+      "byte_order": "little",
+      "created_at_unix": 1791938532.464924,
+      "dtype": "uint16",
+      "num_blocks": 3856,
+      "num_bytes": 15794178,
+      "num_episodes": 7934,
+      "num_tokens": 7897089,
+      "provenance": [
+        {
+          "corpus": "text/code-alpaca-20k",
+          "episodes_accepted": 2000,
+          "episodes_rejected_stage0": 0,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\code-alpaca-20k\\code_alpaca_20k.json"
+        },
+        {
+          "corpus": "text/github-codereview",
+          "episodes_accepted": 161,
+          "episodes_rejected_stage0": 1839,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\github-codereview\\data\\test\\test-00000-of-00001.parquet"
+        },
+        {
+          "corpus": "text/github-codereview",
+          "episodes_accepted": 100,
+          "episodes_rejected_stage0": 1900,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\github-codereview\\data\\train\\train-00000-of-00003.parquet"
+        },
+        {
+          "corpus": "text/hh-rlhf",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 2000,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\hh-rlhf\\harmless-base\\test.jsonl\\test.jsonl"
+        },
+        {
+          "corpus": "text/hh-rlhf",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 2000,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\hh-rlhf\\harmless-base\\train.jsonl\\train.jsonl"
+        },
+        {
+          "corpus": "text/MathInstruct",
+          "episodes_accepted": 1935,
+          "episodes_rejected_stage0": 65,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\MathInstruct\\MathInstruct.json"
+        },
+        {
+          "corpus": "text/MetaMathQA",
+          "episodes_accepted": 1985,
+          "episodes_rejected_stage0": 15,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\MetaMathQA\\MetaMathQA-395K.json"
+        },
+        {
+          "corpus": "text/Nemotron-Math-Proofs-v2",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 2000,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\Nemotron-Math-Proofs-v2\\data\\train.jsonl"
+        },
+        {
+          "corpus": "text/no_robots",
+          "episodes_accepted": 526,
+          "episodes_rejected_stage0": 89,
+          "row_end": 500,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\no_robots\\data\\test-00000-of-00001.parquet"
+        },
+        {
+          "corpus": "text/no_robots",
+          "episodes_accepted": 526,
+          "episodes_rejected_stage0": 89,
+          "row_end": 500,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\no_robots\\data\\test_sft-00000-of-00001.parquet"
+        },
+        {
+          "corpus": "text/oasst1",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 2000,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\oasst1\\2023-04-12_oasst_all.messages.jsonl\\2023-04-12_oasst_all.messages.jsonl"
+        },
+        {
+          "corpus": "text/oasst1",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 2000,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\oasst1\\2023-04-12_oasst_all.trees.jsonl\\2023-04-12_oasst_all.trees.jsonl"
+        },
+        {
+          "corpus": "text/Supra-Reasoning-CoT-Dataset-v2",
+          "episodes_accepted": 1905,
+          "episodes_rejected_stage0": 95,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\Supra-Reasoning-CoT-Dataset-v2\\reasoning_dataset_formatted.jsonl"
+        }
+      ],
+      "receipt_file": "uta_trace_train_shard_00001.receipt.json",
+      "seq_len": 2048,
+      "sha256": "50985b01ec7a29f2b658897adfd3c59de7de6275d47b69de5dadb31d6d3e46c0",
+      "shard_id": "uta_trace_train_shard_00001",
+      "split": "train",
+      "track": "uta_trace",
+      "unmasked_target_tokens": 4336292
+    },
+    {
+      "bin_file": "uta_trace_train_shard_00002.bin",
+      "byte_order": "little",
+      "created_at_unix": 1791942339.6974971,
+      "dtype": "uint16",
+      "num_blocks": 16202,
+      "num_bytes": 66363394,
+      "num_episodes": 32247,
+      "num_tokens": 33181697,
+      "provenance": [
+        {
+          "corpus": "chat/AM-DeepSeek-R1-Distilled-1.4M",
+          "episodes_accepted": 5536,
+          "episodes_rejected_stage0": 2464,
+          "row_end": 8000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\AM-DeepSeek-R1-Distilled-1.4M\\am_0.5M.jsonl"
+        },
+        {
+          "corpus": "chat/AM-DeepSeek-R1-Distilled-1.4M",
+          "episodes_accepted": 4728,
+          "episodes_rejected_stage0": 3272,
+          "row_end": 8000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\AM-DeepSeek-R1-Distilled-1.4M\\am_0.9M.jsonl"
+        },
+        {
+          "corpus": "chat/GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset",
+          "episodes_accepted": 8000,
+          "episodes_rejected_stage0": 0,
+          "row_end": 8000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset\\data\\applied\\earth_climate_25k\\shard-00000.jsonl"
+        },
+        {
+          "corpus": "chat/GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset",
+          "episodes_accepted": 5000,
+          "episodes_rejected_stage0": 0,
+          "row_end": 5000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\chat\\GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset\\data\\applied\\earth_climate_25k\\shard-00001.jsonl"
+        },
+        {
+          "corpus": "text/code-alpaca-20k",
+          "episodes_accepted": 7999,
+          "episodes_rejected_stage0": 1,
+          "row_end": 8000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\code-alpaca-20k\\code_alpaca_20k.json"
+        },
+        {
+          "corpus": "text/github-codereview",
+          "episodes_accepted": 603,
+          "episodes_rejected_stage0": 7397,
+          "row_end": 8000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\github-codereview\\data\\test\\test-00000-of-00001.parquet"
+        },
+        {
+          "corpus": "text/github-codereview",
+          "episodes_accepted": 381,
+          "episodes_rejected_stage0": 7619,
+          "row_end": 8000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\github-codereview\\data\\train\\train-00000-of-00003.parquet"
+        },
+        {
+          "corpus": "text/Nemotron-Math-Proofs-v2",
+          "episodes_accepted": 0,
+          "episodes_rejected_stage0": 8000,
+          "row_end": 8000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\Nemotron-Math-Proofs-v2\\data\\train.jsonl"
+        }
+      ],
+      "receipt_file": "uta_trace_train_shard_00002.receipt.json",
+      "seq_len": 2048,
+      "sha256": "92a84082e738bb8d72d934fa88811d3871993682ca9f91c9158e536c1fab5a44",
+      "shard_id": "uta_trace_train_shard_00002",
+      "split": "train",
+      "track": "uta_trace",
+      "unmasked_target_tokens": 22082192
+    },
+    {
+      "bin_file": "uta_trace_train_shard_00003.bin",
+      "byte_order": "little",
+      "created_at_unix": 1792112955.0269246,
+      "dtype": "uint16",
+      "num_blocks": 2252,
+      "num_bytes": 9224194,
+      "num_episodes": 2301,
+      "num_tokens": 4612097,
+      "provenance": [
+        {
+          "corpus": "text/Nemotron-Math-Proofs-v2",
+          "episodes_accepted": 2000,
+          "episodes_rejected_stage0": 0,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\Nemotron-Math-Proofs-v2\\data\\train.jsonl"
+        },
+        {
+          "corpus": "local_ast_codebase_uta",
+          "episodes_accepted": 445,
+          "episodes_rejected_stage0": 9,
+          "row_end": 454,
+          "row_start": 1,
+          "source_file": "X:\\MCL4-COE\\src\\mcl4_coe"
+        }
+      ],
+      "receipt_file": "uta_trace_train_shard_00003.receipt.json",
+      "seq_len": 2048,
+      "sha256": "a9e05044257975f6997764ad085fd74763ddb9ab989f0b97b78aa66429f41578",
+      "shard_id": "uta_trace_train_shard_00003",
+      "split": "train",
+      "track": "uta_trace",
+      "unmasked_target_tokens": 2814625
+    },
+    {
+      "bin_file": "uta_trace_val_shard_00000.bin",
+      "byte_order": "little",
+      "created_at_unix": 1792112955.058119,
+      "dtype": "uint16",
+      "num_blocks": 136,
+      "num_bytes": 557058,
+      "num_episodes": 144,
+      "num_tokens": 278529,
+      "provenance": [],
+      "receipt_file": "uta_trace_val_shard_00000.receipt.json",
+      "seq_len": 2048,
+      "sha256": "26831ad2937372a5463835f7f79bca5eb0875f92a8a454ec6904278fd3ec0f9e",
+      "shard_id": "uta_trace_val_shard_00000",
+      "split": "val",
+      "track": "uta_trace",
+      "unmasked_target_tokens": 174518
+    }
+  ],
+  "totals": {
+    "num_blocks": 26542,
+    "num_episodes": 65151,
+    "num_shards": 5,
+    "num_tokens": 54358021,
+    "rejected_stage0": 53354,
+    "train_blocks": 2252,
+    "train_tokens": 4612097,
+    "unmasked_target_tokens": 33648618,
+    "val_blocks": 136,
+    "val_tokens": 278529
+  },
+  "trace_markers": {
+    "answer": "#A$#",
+    "hypothesis": "#H$#",
+    "question": "#Q$#",
+    "schedule": "#S$#",
+    "thought": "#T$#",
+    "user": "#U$#"
+  }
+}

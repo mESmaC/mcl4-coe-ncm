@@ -1,0 +1,65 @@
+{
+  "byte_order": "little",
+  "completed_source_files": [],
+  "dtype": "uint16",
+  "excluded_corpora": [
+    "tinystories"
+  ],
+  "format_version": 1,
+  "max_tokens_per_shard": 8388608,
+  "pipeline": "mcl4_coe_sharded_v1",
+  "seq_len": 2048,
+  "shards": [
+    {
+      "bin_file": "typed_decision_train_shard_00000.bin",
+      "byte_order": "little",
+      "created_at_unix": 1791938532.4954464,
+      "dtype": "uint16",
+      "num_blocks": 774,
+      "num_bytes": 3170306,
+      "num_episodes": 1883,
+      "num_tokens": 1585153,
+      "provenance": [
+        {
+          "corpus": "text/tasksource-jev-typed-decisions",
+          "episodes_accepted": 1761,
+          "episodes_rejected_stage0": 239,
+          "row_end": 2000,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\tasksource-jev-typed-decisions\\data\\test-00000-of-00001.parquet"
+        },
+        {
+          "corpus": "text/tasksource-jev-typed-decisions",
+          "episodes_accepted": 122,
+          "episodes_rejected_stage0": 0,
+          "row_end": 122,
+          "row_start": 1,
+          "source_file": "X:\\corpora\\text\\tasksource-jev-typed-decisions\\data\\test-webinstruct-05e8b528d68c.parquet"
+        }
+      ],
+      "receipt_file": "typed_decision_train_shard_00000.receipt.json",
+      "seq_len": 2048,
+      "sha256": "0d88b2579807f3b831b5d3b08f37f759fe7cef4979b593fdca2f0eacbc362c24",
+      "shard_id": "typed_decision_train_shard_00000",
+      "split": "train",
+      "track": "typed_decision",
+      "unmasked_target_tokens": 270842
+    }
+  ],
+  "totals": {
+    "num_blocks": 774,
+    "num_episodes": 1883,
+    "num_shards": 1,
+    "num_tokens": 1585153,
+    "rejected_stage0": 239,
+    "unmasked_target_tokens": 270842
+  },
+  "trace_markers": {
+    "answer": "#A$#",
+    "hypothesis": "#H$#",
+    "question": "#Q$#",
+    "schedule": "#S$#",
+    "thought": "#T$#",
+    "user": "#U$#"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00024.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938526.5947936,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 4173,
+  "num_tokens": 8388609,
+  "provenance": [
+    {
+      "corpus": "text/Nemotron-Pretraining-Legal-v1",
+      "episodes_accepted": 1996,
+      "episodes_rejected_stage0": 4,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Pretraining-Legal-v1\\Nemotron-Pretraining-Legal-Case-Law-Summary\\part_000000.parquet"
+    },
+    {
+      "corpus": "text/Nemotron-Pretraining-Specialized-v1.1",
+      "episodes_accepted": 1908,
+      "episodes_rejected_stage0": 92,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Pretraining-Specialized-v1.1\\Nemotron-Pretraining-Code-Concepts\\part_000000.parquet"
+    },
+    {
+      "corpus": "text/Nemotron-Pretraining-Specialized-v1.1",
+      "episodes_accepted": 1908,
+      "episodes_rejected_stage0": 92,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Pretraining-Specialized-v1.1\\Nemotron-Pretraining-Code-Concepts\\part_000001.parquet"
+    }
+  ],
+  "receipt_file": "pretrain_lm_train_shard_00024.receipt.json",
+  "seq_len": 2048,
+  "sha256": "ac147559f6194bafc8b4b532ebf65d3f9c5528777939f55ead44771bb72d8b3d",
+  "shard_id": "pretrain_lm_train_shard_00024",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}

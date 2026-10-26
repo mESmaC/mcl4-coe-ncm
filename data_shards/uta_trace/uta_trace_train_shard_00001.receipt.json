@@ -1,0 +1,123 @@
+{
+  "bin_file": "uta_trace_train_shard_00001.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938532.464924,
+  "dtype": "uint16",
+  "num_blocks": 3856,
+  "num_bytes": 15794178,
+  "num_episodes": 7934,
+  "num_tokens": 7897089,
+  "provenance": [
+    {
+      "corpus": "text/code-alpaca-20k",
+      "episodes_accepted": 2000,
+      "episodes_rejected_stage0": 0,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\code-alpaca-20k\\code_alpaca_20k.json"
+    },
+    {
+      "corpus": "text/github-codereview",
+      "episodes_accepted": 161,
+      "episodes_rejected_stage0": 1839,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\github-codereview\\data\\test\\test-00000-of-00001.parquet"
+    },
+    {
+      "corpus": "text/github-codereview",
+      "episodes_accepted": 100,
+      "episodes_rejected_stage0": 1900,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\github-codereview\\data\\train\\train-00000-of-00003.parquet"
+    },
+    {
+      "corpus": "text/hh-rlhf",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 2000,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\hh-rlhf\\harmless-base\\test.jsonl\\test.jsonl"
+    },
+    {
+      "corpus": "text/hh-rlhf",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 2000,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\hh-rlhf\\harmless-base\\train.jsonl\\train.jsonl"
+    },
+    {
+      "corpus": "text/MathInstruct",
+      "episodes_accepted": 1935,
+      "episodes_rejected_stage0": 65,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\MathInstruct\\MathInstruct.json"
+    },
+    {
+      "corpus": "text/MetaMathQA",
+      "episodes_accepted": 1985,
+      "episodes_rejected_stage0": 15,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\MetaMathQA\\MetaMathQA-395K.json"
+    },
+    {
+      "corpus": "text/Nemotron-Math-Proofs-v2",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 2000,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Math-Proofs-v2\\data\\train.jsonl"
+    },
+    {
+      "corpus": "text/no_robots",
+      "episodes_accepted": 526,
+      "episodes_rejected_stage0": 89,
+      "row_end": 500,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\no_robots\\data\\test-00000-of-00001.parquet"
+    },
+    {
+      "corpus": "text/no_robots",
+      "episodes_accepted": 526,
+      "episodes_rejected_stage0": 89,
+      "row_end": 500,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\no_robots\\data\\test_sft-00000-of-00001.parquet"
+    },
+    {
+      "corpus": "text/oasst1",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 2000,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\oasst1\\2023-04-12_oasst_all.messages.jsonl\\2023-04-12_oasst_all.messages.jsonl"
+    },
+    {
+      "corpus": "text/oasst1",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 2000,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\oasst1\\2023-04-12_oasst_all.trees.jsonl\\2023-04-12_oasst_all.trees.jsonl"
+    },
+    {
+      "corpus": "text/Supra-Reasoning-CoT-Dataset-v2",
+      "episodes_accepted": 1905,
+      "episodes_rejected_stage0": 95,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Supra-Reasoning-CoT-Dataset-v2\\reasoning_dataset_formatted.jsonl"
+    }
+  ],
+  "receipt_file": "uta_trace_train_shard_00001.receipt.json",
+  "seq_len": 2048,
+  "sha256": "50985b01ec7a29f2b658897adfd3c59de7de6275d47b69de5dadb31d6d3e46c0",
+  "shard_id": "uta_trace_train_shard_00001",
+  "split": "train",
+  "track": "uta_trace",
+  "unmasked_target_tokens": 4336292
+}

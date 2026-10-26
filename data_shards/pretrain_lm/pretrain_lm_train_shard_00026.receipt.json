@@ -1,0 +1,51 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00026.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938529.76485,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 2070,
+  "num_tokens": 8388609,
+  "provenance": [
+    {
+      "corpus": "text/precinct6-cybersecurity",
+      "episodes_accepted": 1229,
+      "episodes_rejected_stage0": 771,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\precinct6-cybersecurity\\graph\\attack_reports.jsonl"
+    },
+    {
+      "corpus": "text/precinct6-cybersecurity",
+      "episodes_accepted": 1229,
+      "episodes_rejected_stage0": 771,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\precinct6-cybersecurity\\graph\\attack_reports.parquet"
+    },
+    {
+      "corpus": "text/txt-files",
+      "episodes_accepted": 1,
+      "episodes_rejected_stage0": 0,
+      "row_end": 1,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\txt-files\\cache\\epub\\1\\pg1.txt"
+    },
+    {
+      "corpus": "text/txt-files",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 1,
+      "row_end": 1,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\txt-files\\cache\\epub\\10\\pg10.txt"
+    }
+  ],
+  "receipt_file": "pretrain_lm_train_shard_00026.receipt.json",
+  "seq_len": 2048,
+  "sha256": "7f29f9fe56123a45cf9b66bdd06f08737d9ce42abb350ff0fa0fd1abcc817a29",
+  "shard_id": "pretrain_lm_train_shard_00026",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}

@@ -1,0 +1,35 @@
+{
+  "bin_file": "uta_trace_train_shard_00003.bin",
+  "byte_order": "little",
+  "created_at_unix": 1792112955.0269246,
+  "dtype": "uint16",
+  "num_blocks": 2252,
+  "num_bytes": 9224194,
+  "num_episodes": 2301,
+  "num_tokens": 4612097,
+  "provenance": [
+    {
+      "corpus": "text/Nemotron-Math-Proofs-v2",
+      "episodes_accepted": 2000,
+      "episodes_rejected_stage0": 0,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Math-Proofs-v2\\data\\train.jsonl"
+    },
+    {
+      "corpus": "local_ast_codebase_uta",
+      "episodes_accepted": 445,
+      "episodes_rejected_stage0": 9,
+      "row_end": 454,
+      "row_start": 1,
+      "source_file": "X:\\MCL4-COE\\src\\mcl4_coe"
+    }
+  ],
+  "receipt_file": "uta_trace_train_shard_00003.receipt.json",
+  "seq_len": 2048,
+  "sha256": "a9e05044257975f6997764ad085fd74763ddb9ab989f0b97b78aa66429f41578",
+  "shard_id": "uta_trace_train_shard_00003",
+  "split": "train",
+  "track": "uta_trace",
+  "unmasked_target_tokens": 2814625
+}

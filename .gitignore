@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+data/
+dataset/
+runs/
+*.pt
+*.bin
+*.log
+data_shards/_portable/

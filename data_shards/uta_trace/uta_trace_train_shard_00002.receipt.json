@@ -1,0 +1,83 @@
+{
+  "bin_file": "uta_trace_train_shard_00002.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791942339.6974971,
+  "dtype": "uint16",
+  "num_blocks": 16202,
+  "num_bytes": 66363394,
+  "num_episodes": 32247,
+  "num_tokens": 33181697,
+  "provenance": [
+    {
+      "corpus": "chat/AM-DeepSeek-R1-Distilled-1.4M",
+      "episodes_accepted": 5536,
+      "episodes_rejected_stage0": 2464,
+      "row_end": 8000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\chat\\AM-DeepSeek-R1-Distilled-1.4M\\am_0.5M.jsonl"
+    },
+    {
+      "corpus": "chat/AM-DeepSeek-R1-Distilled-1.4M",
+      "episodes_accepted": 4728,
+      "episodes_rejected_stage0": 3272,
+      "row_end": 8000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\chat\\AM-DeepSeek-R1-Distilled-1.4M\\am_0.9M.jsonl"
+    },
+    {
+      "corpus": "chat/GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset",
+      "episodes_accepted": 8000,
+      "episodes_rejected_stage0": 0,
+      "row_end": 8000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\chat\\GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset\\data\\applied\\earth_climate_25k\\shard-00000.jsonl"
+    },
+    {
+      "corpus": "chat/GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset",
+      "episodes_accepted": 5000,
+      "episodes_rejected_stage0": 0,
+      "row_end": 5000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\chat\\GPT-5.5-Gemini-3.1-Pro-Grok-4-Claude-Fable-5-Mythos-5-Qwen-3.7-Max-and-more-Distillation-Dataset\\data\\applied\\earth_climate_25k\\shard-00001.jsonl"
+    },
+    {
+      "corpus": "text/code-alpaca-20k",
+      "episodes_accepted": 7999,
+      "episodes_rejected_stage0": 1,
+      "row_end": 8000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\code-alpaca-20k\\code_alpaca_20k.json"
+    },
+    {
+      "corpus": "text/github-codereview",
+      "episodes_accepted": 603,
+      "episodes_rejected_stage0": 7397,
+      "row_end": 8000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\github-codereview\\data\\test\\test-00000-of-00001.parquet"
+    },
+    {
+      "corpus": "text/github-codereview",
+      "episodes_accepted": 381,
+      "episodes_rejected_stage0": 7619,
+      "row_end": 8000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\github-codereview\\data\\train\\train-00000-of-00003.parquet"
+    },
+    {
+      "corpus": "text/Nemotron-Math-Proofs-v2",
+      "episodes_accepted": 0,
+      "episodes_rejected_stage0": 8000,
+      "row_end": 8000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\Nemotron-Math-Proofs-v2\\data\\train.jsonl"
+    }
+  ],
+  "receipt_file": "uta_trace_train_shard_00002.receipt.json",
+  "seq_len": 2048,
+  "sha256": "92a84082e738bb8d72d934fa88811d3871993682ca9f91c9158e536c1fab5a44",
+  "shard_id": "uta_trace_train_shard_00002",
+  "split": "train",
+  "track": "uta_trace",
+  "unmasked_target_tokens": 22082192
+}

@@ -1,0 +1,27 @@
+{
+  "bin_file": "pretrain_lm_train_shard_00020.bin",
+  "byte_order": "little",
+  "created_at_unix": 1791938516.0388415,
+  "dtype": "uint16",
+  "num_blocks": 4096,
+  "num_bytes": 16777218,
+  "num_episodes": 215,
+  "num_tokens": 8388609,
+  "provenance": [
+    {
+      "corpus": "text/arxiv_papers_filtered",
+      "episodes_accepted": 1684,
+      "episodes_rejected_stage0": 316,
+      "row_end": 2000,
+      "row_start": 1,
+      "source_file": "X:\\corpora\\text\\arxiv_papers_filtered\\arxiv-papers-0001.json\\arxiv-papers-0001.json"
+    }
+  ],
+  "receipt_file": "pretrain_lm_train_shard_00020.receipt.json",
+  "seq_len": 2048,
+  "sha256": "c521dd55336470b30283908de7d86edda7fcb1d7970f6ff57415bb54dc60c008",
+  "shard_id": "pretrain_lm_train_shard_00020",
+  "split": "train",
+  "track": "pretrain_lm",
+  "unmasked_target_tokens": 8384512
+}
