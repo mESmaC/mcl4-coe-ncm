@@ -1,6 +1,6 @@
 # MCL4-COE (`ncm`): Markov Chain Local-4, Cognitive Operator Ensemble & Next-Concept Modeling
 
-**`MCL4-COE`** is a cognitive architecture combining **multi-hop sparse Markov-chain graph attention (`MCL4`)**, a **Causal Encoder-Decoder (`CED`) MoE backbone**, a **Composable Cognitive Operator Ensemble (`COE`)** that decomposes reasoning into explicit single-softmax latent operations, and **Donor-Anchored Next-Concept Modeling (`NCM`)** ([Kumbong et al., `arXiv:2610.14162`](https://arxiv.org/abs/2610.14162)).
+**`MCL4-COE`** is a cognitive architecture combining **multi-hop sparse Markov-chain graph attention (`MCL4`)**, a **Causal Encoder-Decoder (`CED`) MoE backbone**, a **Composable Cognitive Operator Ensemble (`COE`)** that decomposes reasoning into explicit single-softmax latent operations, **Donor-Anchored Next-Concept Modeling (`NCM`)** ([Kumbong et al., `arXiv:2610.14162`](https://arxiv.org/abs/2610.14162)), and **Windowless Infinite-Context Inference + Inference-Time Learning (`InfiniteContextPager` & `CodebaseWarmupEngine`)**.
 
 Instead of forcing a monolithic dense transformer to serialize every thought, correlation, and decision into hundreds of English tokens through a 150,000-word vocabulary softmax, `MCL4-COE` executes reasoning operations (`Association`, `Decision`, `Deduction`, `Abduction`, `Induction`, `Evaluation`, `Abstraction`, `Metacognition`) as **composable single-softmax heads** directly over shared encoder-decoder and multiscale `NCM` concept latents.
 
@@ -86,6 +86,21 @@ The table below reports every benchmark from [`benchmark_step_06000_vs_llama32_1
 
 ---
 
+### 3. Effectively Infinite Context Window Inference & Inference-Time Learning (`src/mcl4_coe/context_memory.py`)
+* **Implementation & Full Technical Spec:** [`src/mcl4_coe/context_memory.py`](src/mcl4_coe/context_memory.py) | [`docs/CONTEXT_HIERARCHY_AND_PUBLICATION_ROADMAP.md`](docs/CONTEXT_HIERARCHY_AND_PUBLICATION_ROADMAP.md)
+
+Standard transformers degrade on long contexts for two reasons: RoPE positional indices drift out of distribution past the training window, and dense $O(T^2)$ attention dilutes softmax mass across thousands of irrelevant tokens. `MCL4-COE` solves both while enabling fast inference-time learning on unseen repositories:
+
+1. **Windowless Demand-Paged Context (`InfiniteContextPager` & `WorkingStateLedger`, $1\text{M} \to \infty$ Effective Context):**
+   * **Local-RoPE `TurboQuant` Page Ingestion:** Arbitrarily long token streams are sliced into `page_size = 512` pages, encoded with **local RoPE `[0 .. page_size]`** (so positional embeddings never go out of distribution), summarized into `G = 4` multi-resolution landmarks, and compressed **`~4.2x`** via `TurboQuantKV` (`FWHT` + 3-bit Lloyd-Max + 1-bit `QJL` residual sign sketch) with SHA-256 content deduplication.
+   * **Zero-Forgetting Pinned `WorkingStateLedger` (`CED` `n_prefix` Slot 0):** Permanently pins the active `[OBJECTIVE]`, `[STEP]`, and verified `[INVARIANTS]` in `CED` `n_prefix` slot 0 so the model physically cannot forget its goal across millions of ingested tokens.
+   * **Vectorized `QJL` Inner-Product Retrieval into Position-Invariant `CED` Cross-Attention:** `retrieve_top_k_pages` scores thousands of compressed pages directly in rotated `TurboQuant` space (`turboquant_inner_product`) and decompresses **only the top-$B$ relevant pages** alongside the pinned `WorkingStateLedger` into position-invariant `CED` cross-attention (`build_gist_state`).
+2. **Inference-Time Learning (`CodebaseWarmupEngine`, Dirty-Page Micro-Warmup & Zero-Weight `A.TXY` WAL):**
+   * **Pre-Prompt Session RL Warmup (`CodebaseWarmupEngine.warmup_session`):** When pointed at a new codebase at inference time, `index_repository` compiles the repository AST into the base-36 `ATXYPageStore` (`1,679,616` logical cells across Planes `A0..A5`) and automatically synthesizes AST-verified self-RL tasks (**Symbol & Call-Graph Localization** + **Real-vs-Mutated Code Bug Discrimination**). `warmup_session` freezes `coe.backbone` (preserving 100% of generation fluency), pre-caches the frozen backbone states once, and runs 24+ multi-operator RL updates on the lightweight `COE` operator and `AttentiveMatchedFilterPool` heads (`~600K` params) in **`~1–2 seconds`** (reversible in `<1 ms` via `session.restore_base_weights(coe)`).
+   * **Incremental Dirty-Page Refresh (`refresh_dirty_files`):** When files are modified mid-session, only the dirty AST symbols and `TurboQuant` pages are re-indexed, appended to the framed CRC32 Write-Ahead Log (`WAL`), and micro-adapted in milliseconds.
+
+---
+
 ## Core Architecture Overview
 
 1. **Markov Chain Local-4 Attention (`MCL4`, [`src/mcl4_coe/markov_local4.py`](src/mcl4_coe/markov_local4.py)):**
@@ -139,7 +154,7 @@ flowchart TD
 | **[`docs/01_UNIFIED_ARCHITECTURE_SPEC.md`](docs/01_UNIFIED_ARCHITECTURE_SPEC.md)** | Full technical specification of the `MCL4` router, `CED` cross-attending encoder-decoder fix, `PLE`, `CPUOffloadAdamW` + `NVFP4`, and mathematical definitions of all 9 `COE` cognitive operators. |
 | **[`docs/02_WHY_COE_BEATS_GENERALIST_LLMS.md`](docs/02_WHY_COE_BEATS_GENERALIST_LLMS.md)** | Architectural comparison of composable single-softmax operators (`Decision`, `Association`, `Deduction`, `Abduction`, `Metacognition`) against standard autoregressive token-softmax LLMs. |
 | **[`docs/03_HARDWARE_AND_TRAINING_ROADMAP.md`](docs/03_HARDWARE_AND_TRAINING_ROADMAP.md)** | Consumer GPU memory-hierarchy engineering (`sm_86` $\to$ Blackwell `sm_120`), native `NVFP4` execution, staged curriculum, and repository module map. |
-| **[`docs/CONTEXT_HIERARCHY_AND_PUBLICATION_ROADMAP.md`](docs/CONTEXT_HIERARCHY_AND_PUBLICATION_ROADMAP.md)** | Four-tier context & virtual memory hierarchy (`MCL4` + `TurboQuantKV` + `ContextLMCompressor` + `A.TXY` base-36 virtual memory & `COEAddressRouter`). |
+| **[`docs/CONTEXT_HIERARCHY_AND_PUBLICATION_ROADMAP.md`](docs/CONTEXT_HIERARCHY_AND_PUBLICATION_ROADMAP.md)** | **Infinite-Context Inference & Inference-Time Learning:** `InfiniteContextPager` + `WorkingStateLedger` ($1\text{M}\to\infty$ windowless paging), `TurboQuantKV`, `ContextLMCompressor`, `A.TXY` base-36 virtual memory, and `CodebaseWarmupEngine` fast-weight session RL. |
 | **[`docs/05_ORNITH_SELF_SCAFFOLDING_SPEC.md`](docs/05_ORNITH_SELF_SCAFFOLDING_SPEC.md)** | Specification of **Ornith-1.0** (`U$ -> S$ -> T$ -> A$` self-scaffolding) and **Ornith-1.5 / 2.5** (`Q$ -> H$/S$ -> T$/A$` autonomous self-improvement powered by `COE` operators). |
 | **[`docs/06_V4_PRETRAIN_AND_PURE_RL_RSI_RESULTS.md`](docs/06_V4_PRETRAIN_AND_PURE_RL_RSI_RESULTS.md)** | From-scratch `v4` pretraining (`Step 1 -> 6,000`) and pure self-improvement RL + `Dream-RSI` (`Step 6,001 -> 7,000`) ablations with exact-ratio twin-gated mitosis. |
 | **[`docs/07_PROPER_DONOR_RL_MITOSIS_PROTOCOL.md`](docs/07_PROPER_DONOR_RL_MITOSIS_PROTOCOL.md)** | Donor-anchored RL/RSI mitotic expert splitting protocol and post-mortem comparison (`Granite 3.1` vs. `OLMoE`). |

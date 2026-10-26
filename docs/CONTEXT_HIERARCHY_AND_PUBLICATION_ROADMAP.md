@@ -1,82 +1,97 @@
-# 04. Four-Tier Context & `A.TXY` Factorized Virtual Memory Hierarchy (`src/mcl4_coe/context_memory.py`)
+# 04. Four-Tier Context Hierarchy, Windowless Infinite-Context Inference & Inference-Time Learning (`src/mcl4_coe/context_memory.py`)
 
-This document specifies the four-tier hardware-aware context and virtual memory architecture implemented in [`src/mcl4_coe/context_memory.py`](../src/mcl4_coe/context_memory.py), unifying active sparse attention (`MCL4`), KV/state quantization (`TurboQuantKV`), continuous multi-chunk state carry (`ContextLMCompressor`), and base-36 factorized random-access virtual memory (`ATXYVirtualMemory` + `COEAddressRouter`).
+This document specifies the four-tier context hierarchy, windowless demand-paged context manager (`InfiniteContextPager` + `WorkingStateLedger`), and inference-time repository learning engine (`CodebaseWarmupEngine`) implemented in [`src/mcl4_coe/context_memory.py`](../src/mcl4_coe/context_memory.py).
 
 ---
 
 ## 1. Architectural Motivation & Subsystem Summary
 
-Long-horizon reasoning, repository-scale code analysis, and continual self-improvement face two distinct memory constraints on single-GPU hardware:
-1. **Active Window Efficiency:** Dense $O(T^2)$ attention and uncompressed `BF16` key/value caches saturate VRAM bandwidth and dilute attention mass as active context grows.
-2. **External Knowledge & Repository Scale:** Codebases, AST symbol graphs, and verified rollout histories span tens of thousands of records that should be addressable in $O(1)$ time without sitting permanently in active GPU KV cache.
+Long-horizon reasoning, repository-scale code analysis, and continual self-improvement face three fundamental bottlenecks in standard autoregressive transformers:
+1. **RoPE Positional Drift & Softmax Dilution:** Extending dense attention from 2K to 1M+ tokens pushes Rotary Position Embeddings (`RoPE`) out of distribution and dilutes the attention softmax denominator across thousands of irrelevant tokens.
+2. **KV-Cache VRAM Saturation:** Uncompressed `BF16` key/value caches grow linearly with sequence length and quickly exhaust single-GPU VRAM.
+3. **Static Weights on Unseen Environments:** Standard inference treats a new 100,000-line codebase as passive prompt text rather than adapting the model's routing and verification heads to the repository's AST invariants at test time.
 
-`MCL4-COE` organizes context into a four-tier hierarchy modeled after CPU cache and virtual memory (`L1` $\to$ `L2` $\to$ `L3` $\to$ `Page Table`):
+`MCL4-COE` addresses all three through a four-tier memory hierarchy paired with demand-paged infinite context (`InfiniteContextPager`) and fast inference-time learning (`CodebaseWarmupEngine`):
 
-| Tier | Module (`src/mcl4_coe/`) | Core Mechanism | Scaling & Memory Profile |
+| Tier / Subsystem | Module (`src/mcl4_coe/context_memory.py`) | Core Mechanism | Scaling & Memory Profile |
 | :--- | :--- | :--- | :--- |
-| **Tier 1 (`L1`)** | **`MarkovLocal4Router`**<br>([`markov_local4.py`](../src/mcl4_coe/markov_local4.py)) | Locks mandatory local anchor positions (`{q, q-1, ...}`) and routes bounded multi-hop Markov transitions across the token graph before executing exact QKV attention on the selected subset $\mathcal{S}_q$. | $O(N \cdot |\mathcal{S}_q|)$ active attention; eliminates softmax dilution across long sequences. |
-| **Tier 2 (`L2`)** | **`TurboQuantKV`**<br>([`context_memory.py`](../src/mcl4_coe/context_memory.py)) | Applies a randomized orthonormal Fast Walsh-Hadamard Transform (`FWHT`, $O(D \log D)$), 3-bit Lloyd-Max hypersphere quantization, and a 1-bit Quantized Johnson-Lindenstrauss (`QJL`) residual sign sketch. | **`~4.2x` KV & `EncodedState` VRAM reduction** with unbiased inner-product estimation $\langle q, k \rangle$. |
-| **Tier 3 (`L3`)** | **`ContextLMCompressor`**<br>([`context_memory.py`](../src/mcl4_coe/context_memory.py)) | Compresses completed context chunks into compact summary gist vectors bridged across chunk boundaries via `RecurrentFeedback` and supervised by the `COE` `Abstraction` head (`InfoNCE` multi-resolution alignment). | Continuous cross-chunk state carry at constant active window size. |
-| **Tier 4 (`Page Table`)** | **`ATXYVirtualMemory` + `COEAddressRouter`**<br>([`context_memory.py`](../src/mcl4_coe/context_memory.py)) | Base-36 factorized `A.TXY` virtual address space (`1,679,616` logical cells across Planes `A0..A5`), $O(1)$ two-level page table (`A*36 + T` directory $\to$ `X*36 + Y` cell), CRC32 write-ahead log (`WAL`), and two-stage `COE` `Association` + `Decision` natural-language routing. | **100% exact lookup** across $1\text{K}\text{–}100\text{K}+$ records (`~1.5 µs` page lookup) with flat HBM usage. |
+| **Tier 1 (`L1` Active Window)** | **`MarkovLocal4Router`**<br>([`markov_local4.py`](../src/mcl4_coe/markov_local4.py)) | Locks mandatory local anchor positions (`{q, q-1, ...}`) and routes bounded multi-hop Markov transitions across the token graph before executing exact QKV attention on $\mathcal{S}_q$. | $O(N \cdot |\mathcal{S}_q|)$ active attention; zero softmax dilution. |
+| **Tier 2 (`L2` State Compression)** | **`TurboQuantKV` & `CompressedEncodedState`** | Orthonormal Fast Walsh-Hadamard Transform (`FWHT`, $O(D \log D)$) + 3-bit Lloyd-Max Gaussian centroids + 1-bit `QJL` residual sign sketch. | **`~4.2x` `EncodedState` & KV VRAM reduction** with unbiased rotated inner products (`turboquant_inner_product`). |
+| **Tier 3 (`L3` Gist Carry)** | **`ContextLMCompressor`** | Condenses completed token chunks into compact gist vectors bridged across chunks via `RecurrentFeedback` and supervised by the `COE` `Abstraction` operator. | Continuous cross-chunk semantic carry at fixed window size. |
+| **Tier 4 (`Page Table`)** | **`ATXYPageStore` & `COEAddressRouter`** | Base-36 factorized `A.TXY` virtual address space (`1,679,616` logical cells across Planes `A0..A5`), $O(1)$ two-level page directory, CRC32 `WAL`, and two-stage `Association` + `Decision` routing. | **100% exact lookup** across $1\text{K}\text{–}100\text{K}+$ records (`~1.5 µs` page lookup) with flat HBM usage. |
+| **Windowless Pager ($1\text{M}\to\infty$)** | **`InfiniteContextPager` & `WorkingStateLedger`** | Encodes `page_size=512` pages with local RoPE `[0..page_size]`, pins `WorkingStateLedger` in `CED` `n_prefix` slot 0, and demand-pages only the top-$B$ `TurboQuant` pages into position-invariant `CED` cross-attention. | **$1\text{M}\to\infty$ effective context** with zero RoPE extrapolation drift and zero goal forgetting. |
+| **Inference-Time Learning** | **`CodebaseWarmupEngine` & `CodebaseSessionState`** | Indexes a target repository AST into `A.TXY` + `TurboQuant`, synthesizes AST localization and bug-mutation verification tasks, and adapts the lightweight `COE` operator heads (`~600K` params) in `~1–2s` with `<1ms` rollback. | Fast test-time adaptation + incremental dirty-page refresh (`refresh_dirty_files`) without mutating frozen backbone weights. |
 
 ```mermaid
 flowchart TD
-    subgraph L1["Tier 1: Active Window Sparse Attention (MCL4)"]
-        M1["Mandatory Local State Anchors {q, q-1, ...}"]
-        M2["Top-K Multi-Hop Markov Transition Routing"]
+    subgraph Pager["Windowless Infinite-Context Pager (InfiniteContextPager)"]
+        Ledger["WorkingStateLedger (Pinned in CED n_prefix Slot 0)<br/>[OBJECTIVE] | [STEP] | [INVARIANTS] (Zero Forgetting)"]
+        Stream["Arbitrary Token Stream (1M -> Infinity Tokens)"] -->|"Slice into page_size=512<br/>Local RoPE [0..512] + SHA-256 Dedup"| Pages["TurboQuant Compressed Pages (4.2x Compression)<br/>+ G=4 Multi-Resolution Landmark Keys"]
+        Pages -->|"Vectorized QJL Inner Product<br/>(retrieve_top_k_pages)"| TopB["Top-B Demand-Paged States"]
+        Ledger & TopB -->|"build_gist_state"| CED["Position-Invariant CED Cross-Attention (K_global, V_global)"]
     end
 
-    subgraph L2["Tier 2: Active KV & EncodedState Compression (TurboQuantKV)"]
-        T1["Randomized Orthonormal Fast Walsh-Hadamard Transform (H * D)"]
-        T2["3-Bit Lloyd-Max Gaussian Hypersphere Quantization"]
-        T3["1-Bit QJL Residual Sign Sketch (Unbiased Inner Products <q, k>)"]
+    subgraph ITL["Inference-Time Learning (CodebaseWarmupEngine & ATXYPageStore)"]
+        Repo["Target Codebase / Environment"] -->|"index_python_repo_to_atxy"| ATXY["A.TXY Virtual Memory (Planes A1..A5 + CALLS Graph)"]
+        ATXY -->|"Auto-Synthesize Self-RL Tasks"| Tasks["1. AST Symbol & Call-Graph Localization (route_tasks)<br/>2. Real-vs-Mutated Code Bug Verification (verify_tasks)"]
+        Tasks -->|"warmup_session (~1-2s, Backbone Frozen)"| FastWeights["Adapted COE Operator & Pool Heads (~600K Params)<br/>+ CRC32 WAL Episodic Memory (Reversible in <1ms)"]
     end
 
-    subgraph L3["Tier 3: Continuous Multi-Chunk State Carry (ContextLMCompressor)"]
-        C1["Chunk-Level Summary Gist Vectors + RecurrentFeedback Bridge"]
-        C2["COE Abstraction Operator (Multi-Resolution InfoNCE Alignment)"]
-    end
-
-    subgraph L4["Tier 4: Exact Random-Access Virtual Memory (ATXYVirtualMemory)"]
-        A1["Base-36 Factorized Address A.TXY (1,679,616 Logical Cells)"]
-        A2["COE Association (<0.1ms) + Decision (Shared-State CED) Address Router"]
-        A3["1-Position Factorized Embedding E_A(A) + E_T(T) + E_X(X) + E_Y(Y)"]
-        A4["Single-Register Pointer Programs (READ, FOLLOW, UP, DOWN, PROJECT, FILTER)"]
-        A5["Durable Append-Only CRC32 WAL Writes (Zero-Weight Continual Memory)"]
-    end
-
-    L4 -->|"Pages target AST/record into active window"| L2
-    L3 -->|"Carries continuous semantic state across chunks"| L1
-    L2 -->|"4.2x KV / EncodedState VRAM reduction"| L1
+    CED --> FastWeights
 ```
 
 ---
 
-## 2. Tier 2: `TurboQuantKV` (`FWHT` + 3-Bit Lloyd-Max + 1-Bit `QJL`)
+## 2. Windowless Infinite-Context Inference (`InfiniteContextPager` & `WorkingStateLedger`)
 
-Standard KV-cache quantization suffers from outlier channels that distort uniform integer grids. `TurboQuantKV` ([`src/mcl4_coe/context_memory.py`](../src/mcl4_coe/context_memory.py)) eliminates channel outliers without data-dependent calibration:
-1. **Orthonormal Rademacher Walsh-Hadamard Rotation (`fast_walsh_hadamard`):**
-   Given a hidden state or key/value vector $x \in \mathbb{R}^D$, multiplies elementwise by deterministic Rademacher signs $s \in \{-1, +1\}^D$ and applies the Fast Walsh-Hadamard Transform in $O(D \log D)$:
-   $$\tilde{x} = \frac{1}{\sqrt{D}} H (s \odot x)$$
-   This spreads channel energy uniformly across coordinates so normalized entries closely follow $\mathcal{N}(0, 1)$.
-2. **3-Bit Lloyd-Max Centroid Quantization:**
-   Each rotated coordinate is quantized to the 8-level (`3-bit`) optimal Gaussian Lloyd-Max centroids (`{-2.1520, -1.3439, -0.7560, -0.2451, +0.2451, +0.7560, +1.3439, +2.1520}`).
-3. **1-Bit `QJL` Residual Sign Sketch:**
-   The quantization residual $r = \tilde{x} - \hat{x}_{3\text{bit}}$ is sketched into packed 1-bit signs $\mathrm{sign}(r)$ scaled by $\sqrt{\pi / 2} \, \|r\|_2 / \sqrt{D}$, providing an unbiased correction term for attention inner products $\langle q, k \rangle$.
+Implemented in [`src/mcl4_coe/context_memory.py`](../src/mcl4_coe/context_memory.py#L3052-L3470), `InfiniteContextPager` decouples effective context length from the backbone's physical sequence window:
+
+1. **Zero-Forgetting Pinned `WorkingStateLedger` (`CED` `n_prefix` Slot 0):**
+   * `WorkingStateLedger` stores the active high-level `objective`, `active_plan_step`, and verified key-value `pinned_facts` (`[OBJECTIVE] ... | [STEP] ... | [INVARIANTS] k=v`).
+   * Its `TurboQuant`-compressed `EncodedState` is re-encoded only when modified (`_dirty = True`) and is permanently prepended to `gist_state` (`n_prefix` slot 0) on every forward pass so the model cannot lose track of its objective across millions of streamed tokens.
+2. **Local-RoPE Page Ingestion (`ingest_tokens`):**
+   * Incoming token streams are partitioned into `page_size` (`512`-token) chunks and deduplicated by SHA-256 digest.
+   * Each page is encoded through `backbone.encode_state` using **local RoPE coordinates `[0 .. page_size - 1]`**, ensuring positional embeddings remain strictly in-distribution regardless of total ingested token count (`total_ingested_tokens`).
+   * From each encoded page, `_compute_page_landmarks` extracts `G = 4` normalized multi-resolution landmark vectors, and both the full page (`CompressedEncodedState`) and landmarks (`CompressedKV`) are compressed `~4.2x` via `TurboQuant`.
+3. **Vectorized `QJL` Retrieval & Position-Invariant `CED` Cross-Attention (`retrieve_top_k_pages` & `build_gist_state`):**
+   * Given a query, `retrieve_top_k_pages` computes unbiased inner products (`turboquant_inner_product`) between the query's mean/tail vectors and all stored page landmarks directly in Walsh-Hadamard rotated space.
+   * Only the top-$B$ scoring pages (plus the most recent page) are decompressed and concatenated with the pinned `WorkingStateLedger` into a single position-invariant `EncodedState` fed into the upper `CED` decoder layers via `_cross_attend`.
 
 ---
 
-## 3. Tier 4: `A.TXY` Factorized Virtual Memory & `COEAddressRouter`
+## 3. Inference-Time Learning (`CodebaseWarmupEngine`, Dirty-Page Refresh & `A.TXY` WAL)
 
-### 3.1 Factorized `A.TXY` Coordinate Space & Page Table
-`ATXYVirtualMemory` organizes external records into a 4-coordinate base-36 address space `A.TXY` (`36^4 = 1,679,616` logical addresses):
-* **Two-Level Page Directory:** `A * 36 + T` indexes the top-level directory (`1,296` pages) and `X * 36 + Y` indexes the cell within the page (`1,296` cells/page), supporting verified $O(1)$ lookups in `~1.5 µs`.
-* **Single-Position Factorized Coordinate Embedding:** Rather than tokenizing an address as multiple characters, `(A, T, X, Y)` is injected at a single sequence position as the sum of four coordinate lookup tables:
-  $$E_{\text{addr}}(A, T, X, Y) = E_A(A) + E_T(T) + E_X(X) + E_Y(Y)$$
-  enabling compositional generalization to unseen coordinate combinations once each marginal coordinate value has been observed.
-* **Durable Append-Only Write-Ahead Log (`WAL`):** New records and verified self-improvement artifacts are committed via a framed CRC32 `PREPARE`/`COMMIT` write-ahead log, providing read-after-write persistence across sessions without mutating model weights.
+Rather than treating an unseen repository as static prompt text, `CodebaseWarmupEngine` ([`src/mcl4_coe/context_memory.py`](../src/mcl4_coe/context_memory.py#L1457-L2935)) adapts `MCL4-COE` directly to the target codebase at the start of—and throughout—an inference session:
 
-### 3.2 Semantic Plane Allocation (`A0` – `A5`)
+### 3.1 AST Compilation & Self-Supervised Task Synthesis (`index_repository`)
+When pointed at `repo_root`, `CodebaseWarmupEngine.index_repository`:
+1. **Compiles the Repository AST into `ATXYPageStore`:** Populates Plane `A3` (subsystems), Plane `A2` (files/modules), and Plane `A1` (functions, classes, methods, signatures, docstrings, and `CALLS` / `UP` / `DOWN` edges).
+2. **Compresses Module States via `TurboQuant`:** Encodes each module through the lower `CED` encoder stack, stores its 4-bit `CompressedEncodedState` (`file_turboquant_pages`), and extracts `Abstraction` latent priors (`file_latent_priors`).
+3. **Synthesizes Two Verifiable AST Self-RL Task Families (`_build_codebase_tasks`):**
+   * **Symbol & Call-Graph Localization (`route_tasks`):** Trains and evaluates routing from natural-language architecture/debugging queries (including call-graph hints) to the exact `A.TXY` symbol record against degree-balanced hard-negative symbols from the same module.
+   * **Real-vs-Mutated Code Bug Discrimination (`verify_tasks`):** Splits each repository function into its shared setup context and focal executable invariant line (`_extract_focal_line_and_context`), generates realistic buggy mutations (`_mutate_focal_line`: operator flips `+` $\leftrightarrow$ `-`, boundary flips `<=` $\leftrightarrow$ `>`, axis swaps `dim=-1` $\leftrightarrow$ `dim=0`, guard inversions), and trains the `COE` operators to distinguish the authentic repository implementation from mutated variants.
+
+### 3.2 Fast-Weight Session Warmup with Frozen Backbone (`warmup_session`)
+* `warmup_session` freezes `coe.backbone` (`requires_grad = False`, preserving 100% of pretrained language generation fluency) and pre-caches the frozen backbone's `EncodedState` and `DecodedCandidates` across all synthesized repository tasks **once**.
+* It then executes `24+` multi-operator gradient updates exclusively on the lightweight session-scoped `COE` operator and `AttentiveMatchedFilterPool` heads (`~600K` parameters) in **`~1–2 seconds`**.
+* `CodebaseSessionState` retains a CPU snapshot of the base operator weights (`base_operator_state`), allowing instant `<1 ms` reset between sessions via `session.restore_base_weights(coe)`.
+
+### 3.3 Incremental Dirty-Page Refresh (`refresh_dirty_files`) & Zero-Weight `WAL` Persistence
+* When files are edited during an active coding session, `refresh_dirty_files` detects SHA-256 digest changes, re-parses only the modified files, appends `PREPARE`/`COMMIT` frames to the CRC32 Write-Ahead Log (`ATXYPageStore`), re-compresses the dirty `TurboQuant` pages, and runs a fast micro-warmup (`DirtyPageRefreshReport`).
+* Verified `Ornith` task/harness episodes and evolved `Dream-RSI` search policies are simultaneously persisted into Planes `A4` and `A5` via the append-only `WAL`, providing continual episodic memory across sessions without mutating backbone weights.
+
+---
+
+## 4. `TurboQuantKV` & `A.TXY` Plane Allocation Reference
+
+### 4.1 `TurboQuantKV` (`FWHT` + 3-Bit Lloyd-Max + 1-Bit `QJL`)
+1. **Orthonormal Rademacher Walsh-Hadamard Rotation (`fast_walsh_hadamard`):**
+   $$\tilde{x} = \frac{1}{\sqrt{D}} H (s \odot x), \qquad s \in \{-1, +1\}^D$$
+   spreads channel outliers uniformly across coordinates in $O(D \log D)$ operations so normalized entries closely follow $\mathcal{N}(0, 1)$.
+2. **3-Bit Lloyd-Max Centroid Quantization:** Quantizes rotated coordinates to the 8-level optimal Gaussian centroids (`{-2.1520, -1.3439, -0.7560, -0.2451, +0.2451, +0.7560, +1.3439, +2.1520}`).
+3. **1-Bit `QJL` Residual Sign Sketch:** Sketches the quantization residual $r = \tilde{x} - \hat{x}_{3\text{bit}}$ into 1-bit signs scaled by $\sqrt{\pi / 2} \, \|r\|_2 / \sqrt{D}$ for unbiased inner-product estimation.
+
+### 4.2 `A.TXY` Semantic Plane Allocation (`A0` – `A5`)
 
 | `A.TXY` Plane | Semantic Contents | Role in `MCL4-COE` Coding & Self-Improvement |
 | :--- | :--- | :--- |
@@ -86,17 +101,3 @@ Standard KV-cache quantization suffers from outlier channels that distort unifor
 | **`A3`** | Subsystems, algorithms, relational schemas | Subsystem cells (`DOWN` $\to$ files) & `Deduction` relational rules |
 | **`A4`** | Tasks, test harnesses (`#H$#`), verified artifacts | `Ornith` verified task/solution episodes committed via the CRC32 WAL |
 | **`A5`** | Cognitive scaffolds (`#S$#`), `Dream-RSI` policies | `ScaffoldCache` entries & evolved `DreamProgram` search policies |
-
-### 3.3 Two-Stage Natural-Language Address Routing (`COEAddressRouter`)
-Routing a natural-language query to an exact `A.TXY` cell using a standalone bi-encoder hits the relational binding bottleneck (`~44%` accuracy when multiple records share overlapping entities). `COEAddressRouter` resolves this in two stages on the shared `MCL4-CED` backbone:
-1. **Stage 1 — Fast Candidate Filtering (`Association`, `<0.1 ms`):** Computes centered Pearson similarity between the query's 32-dim `Association` projection and all occupied `A.TXY` cell embeddings to retrieve the top-$M$ candidate records.
-2. **Stage 2 — Shared-State Cross-Attending Verification (`Decision`):** Cross-attends the top-$M$ candidate records against the cached global `K/V` of the query inside the upper `CED` decoder layers and scores them via `AttentiveMatchedFilterPool` + Pearson cosine softmax, reaching **`100%` exact candidate binding** while preserving bitwise candidate-order invariance.
-3. **Composable Pointer Programs:** Once anchored at a starting address, `MultiPassController` can chain single-register pointer operations (`READ`, `FOLLOW`, `UP`, `DOWN`, `PROJECT`, `FILTER`, `FIND`, `COUNT`, `COMPARE`) across the AST/knowledge graph and halt via `Metacognition`.
-
----
-
-## 4. Integration with Verifier-Grounded `Ornith` Rollouts
-
-During self-improvement (`src/mcl4_coe/ornith_rl.py`), `ATXYVirtualMemory` serves as persistent zero-weight episodic memory:
-1. **Sandboxed Execution Verification (`verify_python_rollout`):** Candidate `#T$#` reasoning traces and `#A$#` solutions are validated for AST safety and executed against the task's `#H$#` unit-test harness in an isolated namespace to produce deterministic rewards $r(\tau_i, h) \in [0, 1]$.
-2. **Joint Operator + Decoder Update & WAL Persistence:** Winning trajectories update the 9 `COE` operators via staleness-weighted `grpo_clipped_loss` and the decoder via `0x8000` prompt-masked self-distillation, while verified task/harness episodes and winning scaffolds are committed directly to Planes `A4` and `A5`.
