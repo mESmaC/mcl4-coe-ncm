@@ -2689,3 +2689,88 @@ class NCMSystem(nn.Module):
             per_level_deduction=per_level_ded,
             level_decoded_texts=level_decoded_texts,
         )
+
+
+
+def load_pretrained_mcl4_coe_ncm(
+    repo_id_or_path: str,
+    *,
+    device: str | torch.device = "auto",
+    dtype: str | torch.dtype = "bfloat16",
+    token: str | None = None,
+) -> CognitiveOperatorEnsemble:
+    """Load an `MCL4-COE + NCM` model from a Hugging Face repo ID or local directory (`model.safetensors` + `config.json`)."""
+    from dataclasses import fields
+    import json
+    from pathlib import Path
+    from safetensors.torch import load_file
+    from .backbone import MCL4CEDBackbone, MCL4CEDConfig
+    from .operators import COEConfig, CognitiveOperatorEnsemble
+
+    if str(device) == "auto":
+        target_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+        target_device = torch.device(device)
+
+    dtype_map = {
+        "bfloat16": torch.bfloat16,
+        "bf16": torch.bfloat16,
+        "float16": torch.float16,
+        "fp16": torch.float16,
+        "float32": torch.float32,
+        "fp32": torch.float32,
+    }
+    target_dtype = dtype_map.get(str(dtype).lower(), torch.bfloat16) if isinstance(dtype, str) else dtype
+
+    local_dir = Path(repo_id_or_path)
+    if local_dir.is_dir() and (local_dir / "config.json").is_file():
+        cfg_path = local_dir / "config.json"
+        st_path = local_dir / "model.safetensors"
+    else:
+        from huggingface_hub import hf_hub_download
+
+        cfg_path = Path(hf_hub_download(repo_id=repo_id_or_path, filename="config.json", token=token))
+        st_path = Path(hf_hub_download(repo_id=repo_id_or_path, filename="model.safetensors", token=token))
+
+    meta = json.loads(cfg_path.read_text(encoding="utf-8"))
+    valid_b = {f.name for f in fields(MCL4CEDConfig)}
+    valid_c = {f.name for f in fields(COEConfig)}
+    valid_n = {f.name for f in fields(NCMConfig)}
+
+    b_dict = {k: v for k, v in (meta.get("backbone_config") or {}).items() if k in valid_b and v is not None}
+    c_dict = {k: v for k, v in (meta.get("coe_config") or {}).items() if k in valid_c and v is not None}
+    n_dict = {k: v for k, v in (meta.get("ncm_config") or {}).items() if k in valid_n and v is not None}
+
+    if "dense_expert_indices" in b_dict and isinstance(b_dict["dense_expert_indices"], list):
+        b_dict["dense_expert_indices"] = tuple(b_dict["dense_expert_indices"])
+    if "manual_levels" in n_dict and isinstance(n_dict["manual_levels"], list):
+        n_dict["manual_levels"] = tuple(n_dict["manual_levels"])
+
+    b_cfg = MCL4CEDConfig(**b_dict)
+    c_cfg = COEConfig(**c_dict)
+    ncm_cfg = NCMConfig(**n_dict) if n_dict else None
+
+    prev_dtype = torch.get_default_dtype()
+    torch.set_default_dtype(target_dtype)
+    try:
+        model = CognitiveOperatorEnsemble(MCL4CEDBackbone(b_cfg), c_cfg)
+        if ncm_cfg is not None:
+            model.create_ncm_system(ncm_cfg)
+    finally:
+        torch.set_default_dtype(prev_dtype)
+
+    state_dict = load_file(str(st_path), device="cpu")
+    model.load_state_dict(state_dict, strict=True)
+
+    mp_list = [tuple(int(x) for x in pair) for pair in meta.get("mitotic_pairs", []) if len(pair) == 2]
+    rel_set = {tuple(int(x) for x in pair) for pair in meta.get("released_mitotic_pairs", []) if len(pair) == 2}
+    active_pairs = [p for p in mp_list if p not in rel_set]
+    for blk in list(model.backbone.encoder_layers) + list(model.backbone.decoder_layers):
+        blk.moe.mitotic_pairs = list(active_pairs)
+
+    model.to(device=target_device, dtype=target_dtype)
+    for mod in model.modules():
+        if isinstance(mod, torch.nn.LayerNorm):
+            mod.to(device=target_device, dtype=torch.float32)
+    model.eval()
+    return model

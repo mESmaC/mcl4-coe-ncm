@@ -411,3 +411,6 @@ __all__ = [
     "verify_python_rollout",
 ]
 
+
+from .ncm import load_pretrained_mcl4_coe_ncm
+__all__.append("load_pretrained_mcl4_coe_ncm")
