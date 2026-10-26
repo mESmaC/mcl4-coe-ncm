@@ -277,3 +277,20 @@ Evaluating [`DonorAnchoredMultiscaleVQVAE.reconstruct_multiscale_tokens`](../src
 
 ### 7.4 Next Step for Standalone Open-Loop NCM Generation
 While Stage-1 (`DonorAnchoredMultiscaleVQVAE`) converged to `84.4%–89.5%` reconstruction accuracy in 500 steps, Stage-2 (`NCMGeneratorAdapter`) reached `~21.9%` coarse concept accuracy (`ncm_per_level_acc`), which is not yet sufficient for open-loop cascading ($k=0 \to 5$) without teacher forcing. Running a dedicated Stage-2 generator distillation phase on the now-converged Stage-1 VQ-VAE codebooks will unlock standalone $K$-step parallel NCM inference and speculative drafting.
+
+
+---
+
+## 8. Released Public Checkpoints (`Step 9,000` Granite & `Step 10,000` Llama-3.2 Mitosis Round 2)
+
+1. **`mesmac/MCL4-COE-v7-Granite-3.1-1B-NCM-MoE` (`Step 9,000`, `1.77B` Parameters):**
+   - **Topology:** `ibm-granite/granite-3.1-1b-a400m-instruct` grafted into a 24-layer `MCL4-CED` stack (`12` encoder + `12` decoder layers, `d_model=1024, n_heads=16, markov_local_tokens=8, markov_attend_tokens=24`) and mitotically expanded from `E=32` $\to$ **`E=40, top_k=8` NVFP4** (`8` mitotic twin pairs: `[13,32], [31,33], [19,34], [8,35], [30,36], [24,37], [28,38], [0,39]`), paired with a **6-level `NCM` hierarchy** ($\ell_k \in [1, 4, 11, 24, 41, 64]$, $V_k = 1024$).
+   - **Step 9,000 Final Telemetry (`27.55M` cumulative tokens, `46,723,200` fused NVFP4 GEMMs):**
+     - `ncm_codebook_utilization`: **`77.78%`** (up from `62.92%` at Step 5,500)
+     - `ncm_recon_accuracy`: **`85.35%`** (`ncm_vq_recon_loss = 0.6523`)
+     - `ornith_pass_rate`: **`99.66%`** (`ornith_rollout_reward = 0.9971`, `ornith_total_pp = 10,606,273.6`, `236` accepted `Dream-RSI` revisions across `8,574,600` dreamed replays)
+     - Held-out validation (`val_bpb`): **`0.7535`** (`val_bpb_typed_decision = 0.4981`, `val_bpb_uta_trace = 0.7763`, `val_bpb_pretrain_lm = 1.0007`)
+
+2. **`mesmac/MCL4-COE-v9-Llama-3.2-1B-NCM-Mitosis-R2` (`Step 10,000`, `2.43B` Parameters):**
+   - **Topology:** `unsloth/Llama-3.2-1B-Instruct` (`meta-llama/Llama-3.2-1B-Instruct`) 16-layer dense transformer split into `8` `CED` encoder layers + `8` `CED` decoder layers (`d_model=2048, n_heads=32, markov_local_tokens=8, markov_attend_tokens=24`), Sliced-Dense upcycled to `E=8, top_k=8` (`expert_hidden_dim=1024, routed_scaling_factor=8.0`) at Step 0, and mitotically expanded across two rounds (`Round 1: E=8 -> 12` at Step 6,000; `Round 2: E=12 -> 16, top_k=8` at Step 8,000) with a **4-level `NCM` hierarchy** ($\ell_k \in [1, 8, 29, 64]$, $V_k = 1024$) across 64 verifiable RLVR skill families and `Dream-RSI` (`137` accepted revisions, `9,041,760` dreamed replays).
+   - **Full Benchmark Artifacts:** [`runs/colab_mcl4_coe_v9_llama32_1b_dense_ncm_rl/`](../runs/colab_mcl4_coe_v9_llama32_1b_dense_ncm_rl/) (`benchmark_step_04000_vs_llama32_1b.json`, `benchmark_step_06000_vs_llama32_1b.json`, and `benchmark_step_10000_mitosis_r2_vs_llama32_1b.json`).

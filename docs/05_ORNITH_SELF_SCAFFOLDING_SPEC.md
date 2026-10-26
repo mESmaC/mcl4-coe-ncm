@@ -1,6 +1,6 @@
 # 05. Ornith-1.0 Self-Scaffolding & Ornith-1.5 End-to-End Self-Improvement in `MCL4-COE`
 
-Inspired by [Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding](https://ornith.ai/ornith_1_0.html), [Ornith-1.5: From Self-Scaffolding to Self-Improvement](https://ornith.ai/ornith_1_5.html), and the RL/topology mechanics in [`mini`](https://github.com/mESmaC/mini) (`chat_rl.py` and `expert_lifecycle.py`), **`MCL4-COE` implements both Ornith-1.0 (two-stage self-scaffolding) and Ornith-1.5 (three-stage autonomous task, harness/scaffold, and solution self-improvement) natively inside its Cognitive Operator Ensemble (`COE`).**
+Inspired by [Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding](https://ornith.ai/ornith_1_0.html), [Ornith-1.5: From Self-Scaffolding to Self-Improvement](https://ornith.ai/ornith_1_5.html), and the RL/topology mechanics in `mini` (`chat_rl.py` and `expert_lifecycle.py`), **`MCL4-COE` implements both Ornith-1.0 (two-stage self-scaffolding) and Ornith-1.5 (three-stage autonomous task, harness/scaffold, and solution self-improvement) natively inside its Cognitive Operator Ensemble (`COE`).**
 
 ---
 

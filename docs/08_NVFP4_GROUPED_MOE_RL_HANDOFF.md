@@ -12,7 +12,7 @@
 ### A. Local Inference Platform Setup & Verification (`scripts/chat_web.py`)
 1. Downloaded the `2.06B` (`E = 48`) Mitotic RL Soup checkpoint (`step_06000_mitotic_rl_soup.pt`) from `mesmac/mcl4-coe-runs` into `X:\MCL4-COE\runs\colab_mcl4_coe_v7_granite_overnight_mitosis\checkpoints\step_06000.pt`.
 2. Fixed two dtype/config bugs when loading `bfloat16` donor checkpoints:
-   - [`scripts/chat_web.py`](../scripts/chat_web.py): Preserved `float32` on `nn.LayerNorm` weights/biases after `model.to(dtype=dtype)` so `RecurrentFeedback.norm` (`F.layer_norm`) does not raise `RuntimeError: expected scalar type Float but found BFloat16` when given `float32` recurrent states.
+   - `scripts/launch_inference_ui.py`: Preserved `float32` on `nn.LayerNorm` weights/biases after `model.to(dtype=dtype)` so `RecurrentFeedback.norm` (`F.layer_norm`) does not raise `RuntimeError: expected scalar type Float but found BFloat16` when given `float32` recurrent states.
    - [`src/mcl4_coe/trainer.py`](../src/mcl4_coe/trainer.py): Applied the same `nn.LayerNorm` `float32` preservation during `train_dtype="bfloat16"` initialization and added fallback to `payload.get("config")` when `.meta.json` lacks an inline `"config"` block.
 
 ---
