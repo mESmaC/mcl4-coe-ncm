@@ -15,11 +15,11 @@ Long-horizon reasoning, repository-scale code analysis, and continual self-impro
 
 | Tier / Subsystem | Module (`src/mcl4_coe/context_memory.py`) | Core Mechanism | Scaling & Memory Profile |
 | :--- | :--- | :--- | :--- |
-| **Tier 1 (`L1` Active Window)** | **`MarkovLocal4Router`**<br>([`markov_local4.py`](../src/mcl4_coe/markov_local4.py)) | Locks mandatory local anchor positions (`{q, q-1, ...}`) and routes bounded multi-hop Markov transitions across the token graph before executing exact QKV attention on $\mathcal{S}_q$. | $O(N \cdot |\mathcal{S}_q|)$ active attention; zero softmax dilution. |
-| **Tier 2 (`L2` State Compression)** | **`TurboQuantKV` & `CompressedEncodedState`** | Orthonormal Fast Walsh-Hadamard Transform (`FWHT`, $O(D \log D)$) + 3-bit Lloyd-Max Gaussian centroids + 1-bit `QJL` residual sign sketch. | **`~4.2x` `EncodedState` & KV VRAM reduction** with unbiased rotated inner products (`turboquant_inner_product`). |
+| **Tier 1 (`L1` Active Window)** | **`MarkovLocal4Router`**<br>([`markov_local4.py`](../src/mcl4_coe/markov_local4.py)) | Locks mandatory local anchor positions (`{q, q-1, ...}`) and routes bounded multi-hop Markov transitions across the token graph before executing exact QKV attention on $\mathcal{S}_q$. | $O(N \cdot K_{\mathrm{attend}})$ active attention; zero softmax dilution. |
+| **Tier 2 (`L2` State Compression)** | **`TurboQuantKV` & `CompressedEncodedState`** | Orthonormal Fast Walsh-Hadamard Transform (`FWHT`, $O(D \log D)$ complexity) + 3-bit Lloyd-Max Gaussian centroids + 1-bit `QJL` residual sign sketch. | **`~4.2x` `EncodedState` & KV VRAM reduction** with unbiased rotated inner products (`turboquant_inner_product`). |
 | **Tier 3 (`L3` Gist Carry)** | **`ContextLMCompressor`** | Condenses completed token chunks into compact gist vectors bridged across chunks via `RecurrentFeedback` and supervised by the `COE` `Abstraction` operator. | Continuous cross-chunk semantic carry at fixed window size. |
-| **Tier 4 (`Page Table`)** | **`ATXYPageStore` & `COEAddressRouter`** | Base-36 factorized `A.TXY` virtual address space (`1,679,616` logical cells across Planes `A0..A5`), $O(1)$ two-level page directory, CRC32 `WAL`, and two-stage `Association` + `Decision` routing. | **100% exact lookup** across $1\text{K}\text{–}100\text{K}+$ records (`~1.5 µs` page lookup) with flat HBM usage. |
-| **Windowless Pager ($1\text{M}\to\infty$)** | **`InfiniteContextPager` & `WorkingStateLedger`** | Encodes `page_size=512` pages with local RoPE `[0..page_size]`, pins `WorkingStateLedger` in `CED` `n_prefix` slot 0, and demand-pages only the top-$B$ `TurboQuant` pages into position-invariant `CED` cross-attention. | **$1\text{M}\to\infty$ effective context** with zero RoPE extrapolation drift and zero goal forgetting. |
+| **Tier 4 (`Page Table`)** | **`ATXYPageStore` & `COEAddressRouter`** | Base-36 factorized `A.TXY` virtual address space (`1,679,616` logical cells across Planes `A0..A5`), $O(1)$ two-level page directory, CRC32 `WAL`, and two-stage `Association` + `Decision` routing. | **100% exact lookup** across `1K–100K+` records (`~1.5 µs` page lookup) with flat HBM usage. |
+| **Windowless Pager ($1\mathrm{M} \to \infty$)** | **`InfiniteContextPager` & `WorkingStateLedger`** | Encodes `page_size=512` pages with local RoPE `[0..page_size]`, pins `WorkingStateLedger` in `CED` `n_prefix` slot 0, and demand-pages only the `top-B` `TurboQuant` pages into position-invariant `CED` cross-attention. | **$1\mathrm{M} \to \infty$ effective context** with zero RoPE extrapolation drift and zero goal forgetting. |
 | **Inference-Time Learning** | **`CodebaseWarmupEngine` & `CodebaseSessionState`** | Indexes a target repository AST into `A.TXY` + `TurboQuant`, synthesizes AST localization and bug-mutation verification tasks, and adapts the lightweight `COE` operator heads (`~600K` params) in `~1–2s` with `<1ms` rollback. | Fast test-time adaptation + incremental dirty-page refresh (`refresh_dirty_files`) without mutating frozen backbone weights. |
 
 ```mermaid
@@ -55,7 +55,7 @@ Implemented in [`src/mcl4_coe/context_memory.py`](../src/mcl4_coe/context_memory
    * From each encoded page, `_compute_page_landmarks` extracts `G = 4` normalized multi-resolution landmark vectors, and both the full page (`CompressedEncodedState`) and landmarks (`CompressedKV`) are compressed `~4.2x` via `TurboQuant`.
 3. **Vectorized `QJL` Retrieval & Position-Invariant `CED` Cross-Attention (`retrieve_top_k_pages` & `build_gist_state`):**
    * Given a query, `retrieve_top_k_pages` computes unbiased inner products (`turboquant_inner_product`) between the query's mean/tail vectors and all stored page landmarks directly in Walsh-Hadamard rotated space.
-   * Only the top-$B$ scoring pages (plus the most recent page) are decompressed and concatenated with the pinned `WorkingStateLedger` into a single position-invariant `EncodedState` fed into the upper `CED` decoder layers via `_cross_attend`.
+   * Only the `top-B` scoring pages (plus the most recent page) are decompressed and concatenated with the pinned `WorkingStateLedger` into a single position-invariant `EncodedState` fed into the upper `CED` decoder layers via `_cross_attend`.
 
 ---
 
@@ -86,10 +86,14 @@ When pointed at `repo_root`, `CodebaseWarmupEngine.index_repository`:
 
 ### 4.1 `TurboQuantKV` (`FWHT` + 3-Bit Lloyd-Max + 1-Bit `QJL`)
 1. **Orthonormal Rademacher Walsh-Hadamard Rotation (`fast_walsh_hadamard`):**
-   $$\tilde{x} = \frac{1}{\sqrt{D}} H (s \odot x), \qquad s \in \{-1, +1\}^D$$
+
+$$
+\tilde{x} = \frac{1}{\sqrt{D}} H (s \odot x), \qquad s \in \lbrace -1, +1 \rbrace^D
+$$
+
    spreads channel outliers uniformly across coordinates in $O(D \log D)$ operations so normalized entries closely follow $\mathcal{N}(0, 1)$.
 2. **3-Bit Lloyd-Max Centroid Quantization:** Quantizes rotated coordinates to the 8-level optimal Gaussian centroids (`{-2.1520, -1.3439, -0.7560, -0.2451, +0.2451, +0.7560, +1.3439, +2.1520}`).
-3. **1-Bit `QJL` Residual Sign Sketch:** Sketches the quantization residual $r = \tilde{x} - \hat{x}_{3\text{bit}}$ into 1-bit signs scaled by $\sqrt{\pi / 2} \, \|r\|_2 / \sqrt{D}$ for unbiased inner-product estimation.
+3. **1-Bit `QJL` Residual Sign Sketch:** Sketches the quantization residual $r = \tilde{x} - \hat{x}_{3\mathrm{bit}}$ into 1-bit signs scaled by $\sqrt{\pi / 2} \lVert r \rVert_2 / \sqrt{D}$ for unbiased inner-product estimation.
 
 ### 4.2 `A.TXY` Semantic Plane Allocation (`A0` – `A5`)
 

@@ -28,8 +28,8 @@ To saturate Blackwell (`sm_120`) `NVFP4` Tensor Cores on fine-grained MoE layers
    - Checks `weight._version` per expert so frozen donor experts are quantized once at startup and the `8` plastic experts per layer are re-quantized only once per `optimizer.step()` (`0.176 ms` batched via `@torch.compile`), serving cached `NVFP4` weights in `< 1 µs` across micro-batches, recurrence depth steps, all 9 COE operators (`forward_all_operators`), Ornith GRPO rollouts, and Dream-RSI cycles.
 5. **Full `SparseMoE` Integration ([`src/mcl4_coe/backbone.py`](../src/mcl4_coe/backbone.py)):**
    - Wired `_run_grouped_experts` into:
-     1. Main top-$k$ routed `SparseMoE.forward` path
-     2. `combine_dense_and_sparse` residual top-$k$ path (used by all 9 COE operators)
+     1. Main `top-k` routed `SparseMoE.forward` path
+     2. `combine_dense_and_sparse` residual `top-k` path (used by all 9 COE operators)
      3. `forward_dense_subset` coalition path (used by all 9 COE operators)
 
 ### Benchmark Results on Blackwell (`sm_120`)

@@ -28,26 +28,30 @@ Inherited from [`mini/src/mini_moe/data.py`](https://github.com/mESmaC/mini):
 
 ### 2.1 Per-Layer Token Embeddings (`PLE`)
 Adapted from `mini` (`PerLayerTokenEmbedding`) and `oracle/ple.py`:
-* Each transformer layer $l$ owns a narrow token lookup table $E^{(l)} \in \mathbb{R}^{V \times d_{\text{ple}}}$ (`d_ple = 32` or `64`), a projection to `d_model`, an `FP32` RMSNorm, and a learned scalar gate.
-* **Why it matters:** On byte or compact vocabularies, `PLE` injects fresh token identity directly into every layer's residual stream, adding parameter capacity with $O(1)$ lookup cost per token rather than widening the $O(d_{\text{model}} \times d_{\text{ffn}})$ expert matrices.
+* Each transformer layer $l$ owns a narrow token lookup table $E^{(l)} \in \mathbb{R}^{V \times d_{\mathrm{ple}}}$ (`d_ple = 32` or `64`), a projection to `d_model`, an `FP32` RMSNorm, and a learned scalar gate.
+* **Why it matters:** On byte or compact vocabularies, `PLE` injects fresh token identity directly into every layer's residual stream, adding parameter capacity with $O(1)$ lookup cost per token rather than widening the $O(d_{\mathrm{model}} \times d_{\mathrm{ffn}})$ expert matrices.
 
 ### 2.2 `MCL4`: Bounded Markov Chain Attention with 4 Mandatory Local Anchors
 Adapted from `mcattn` (`tinystories_1m_markov_local4`) and `oracle/markov_local4.py`:
 * **The Layer-0 Byte Starvation Discovery:** Frozen-checkpoint diagnostics in `mcattn` proved that standard attention places **83.77%** of its first-layer weight on `{t, t-1, t-2, t-3}` to assemble local bytes into words/numbers, whereas pure semantic Markov routing placed only **3.06%** there.
 * **The `MCL4` Selection Policy:**
-  1. **Bounded-Degree Causal Token Graph:** Each node $i$ has a self-edge, local edges at offsets $\{\pm 1, \pm 2, \pm 4\}$ (clamped causally to $\le q$), and up to 4 backward semantic edges to earlier tokens with highest routing-key cosine similarity.
-  2. **Query-Conditioned Multi-Hop Walk:** For query $q$, walkers start at the top-$W$ (`W = 4`) seed nodes and take $S$ (`S = 3`) transitions using:
-     $$P_q(i \to j) = \text{softmax}_{j \in \mathcal{N}_q(i)} \left( \frac{\tanh(q_{\text{route}}[q] + s_{\text{route}}[i]) \cdot k_{\text{route}}[j]}{\sqrt{r}} \right)$$
-     Bounded beam propagation (`beam_size = 8`) merges duplicate destinations differentiably (`_coalesce`) and tracks visitation mass.
-  3. **Guaranteed `Local-4` Readout:** The hard attention subset $\mathcal{S}_q$ (`|S_q| <= 16`) always reserves the **4 local anchors** $\{q, q-1, q-2, q-3\}$ plus up to **12 highest-visitation Markov-walked positions**.
+  1. **Bounded-Degree Causal Token Graph:** Each node $i$ has a self-edge, local edges at offsets $\lbrace \pm 1, \pm 2, \pm 4 \rbrace$ (clamped causally to $\le q$), and up to 4 backward semantic edges to earlier tokens with highest routing-key cosine similarity.
+  2. **Query-Conditioned Multi-Hop Walk:** For query $q$, walkers start at the `top-W` (`W = 4`) seed nodes and take $S$ (`S = 3`) transitions using:
+
+$$
+P_q(i \to j) = \mathrm{softmax}_{j \in \mathcal{N}_q(i)} \left( \frac{\tanh(q_{\mathrm{route}}[q] + s_{\mathrm{route}}[i]) \cdot k_{\mathrm{route}}[j]}{\sqrt{r}} \right)
+$$
+
+  Bounded beam propagation (`beam_size = 8`) merges duplicate destinations differentiably (`_coalesce`) and tracks visitation mass.
+  3. **Guaranteed `Local-4` Readout:** The hard attention subset $\mathcal{S}_q$ (`|S_q| <= 16`) always reserves the **4 local anchors** $\lbrace q, q-1, q-2, q-3 \rbrace$ plus up to **12 highest-visitation Markov-walked positions**.
   4. **Ordinary QKV Attention on $\mathcal{S}_q$ + Straight-Through Router Surrogate:** Forward values use exact scaled dot-product attention restricted to $\mathcal{S}_q$ (eliminating softmax dilution from the remaining context), while the backward pass supplies routing gradients via the visitation mass surrogate.
 
 ### 2.3 Causal Encoder-Decoder (`CED`) — Solving the Bi-Encoder Decision Bottleneck
 Adapted from `oracle/causal.py` and `mcattn/association.py`:
 * **What went wrong in `mcattn.decision`:** In `mcattn`, `context` (`state + question`) and candidate `options` (`"dog"`, `"rabbit"`, `"2"`) were encoded in completely separate `backbone.encode()` passes before pooling. Because options never attended to the state tokens inside attention, pooled 1-word options collapsed to generic byte averages (`44.4%` majority accuracy).
 * **How `CED` Fixes It in `MCL4-COE`:**
-  1. **Lower Causal Encoder Layers ($L_{\text{enc}}$):** Process the shared conditioning prefix (`state`, `premises`, `instructions`) **once**, producing cached global keys and values $(K_{\text{global}}, V_{\text{global}})$.
-  2. **Upper Decoder / Operator Layers ($L_{\text{dec}}$):** Each candidate option, hypothesis, or `T$ / A$` continuation runs through the upper layers while **cross-attending directly to $(K_{\text{global}}, V_{\text{global}})$ from the state** alongside its own `MCL4` local/routed states!
+  1. **Lower Causal Encoder Layers ($L_{\mathrm{enc}}$):** Process the shared conditioning prefix (`state`, `premises`, `instructions`) **once**, producing cached global keys and values $(K_{\mathrm{global}}, V_{\mathrm{global}})$.
+  2. **Upper Decoder / Operator Layers ($L_{\mathrm{dec}}$):** Each candidate option, hypothesis, or `T$ / A$` continuation runs through the upper layers while **cross-attending directly to $(K_{\mathrm{global}}, V_{\mathrm{global}})$ from the state** alongside its own `MCL4` local/routed states!
   3. **Result:** Candidate $m$ directly compares its tokens against the exact evidence in `state` before pooling into its final feature vector, while still encoding the shared `state` only once per batch.
 
 ### 2.4 Fine-Grained Dropless MoE + `CPUOffloadAdamW` + Native `NVFP4`
@@ -63,21 +67,29 @@ Instead of forcing all reasoning through autoregressive text generation, `MCL4-C
 
 ### 3.1 `Association` (Relational Graph Operator)
 * **Purpose:** Measure how typed inputs relate (`supports`, `contradicts`, `precedes`, `similar`) without forcing a winner-take-all choice.
-* **Mechanism:** Maps `CED`-contextualized item states $h_i, h_j$ through learned projections $P_{\text{left}}, P_{\text{right}} \in \mathbb{R}^{d_{\text{model}} \times d_{\text{proj}}}$ (`d_proj = 32`) and computes FP32 centered Pearson similarity:
-  $$\tilde{u} = u - \bar{u}, \quad \text{sim}_{\text{Pearson}}(u, v) = \frac{\tilde{u} \cdot \tilde{v}}{\|\tilde{u}\|_2 \|\tilde{v}\|_2 + \epsilon} \in [-1, 1]$$
+* **Mechanism:** Maps `CED`-contextualized item states $h_i, h_j$ through learned projections $P_{\mathrm{left}}, P_{\mathrm{right}} \in \mathbb{R}^{d_{\mathrm{model}} \times d_{\mathrm{proj}}}$ (`d_proj = 32`) and computes FP32 centered Pearson similarity:
+
+$$
+\tilde{u} = u - \bar{u}, \qquad \mathrm{sim}_{\mathrm{Pearson}}(u, v) = \frac{\tilde{u} \cdot \tilde{v}}{\lVert \tilde{u} \rVert_2 \lVert \tilde{v} \rVert_2 + \epsilon} \in [-1, 1]
+$$
+
 * **Output:** Pairwise or query-to-set relation scores $S_{ij}$ and independent calibrated link probabilities $\sigma(\alpha S_{ij} + \beta)$ (allowing multiple simultaneous links without mutual exclusion).
 
 ### 3.2 `Decision` (`Choice` / `Noul` / `Score` Single-Softmax Operator)
-* **Purpose:** Permutation-invariant selection or expected-value estimation over a candidate set $\mathcal{C} = \{c_1, \dots, c_M\}$.
-* **Mechanism:** Each candidate $c_m$ is contextualized against the shared `CED` state prefix, pooled over valid tokens, and scored via centered Pearson/cosine similarity $s_m = \text{sim}(z_{\text{state}}, z_{c_m})$ with learned log-clamped scale $\tau = \exp(\text{clamp}(\log \tau, \ln 0.1, \ln 100))$:
-  $$p_m = \frac{\exp(\tau s_m)}{\sum_{k=1}^M \exp(\tau s_k)}$$
+* **Purpose:** Permutation-invariant selection or expected-value estimation over a candidate set $\mathcal{C} = \lbrace c_1, \dots, c_M \rbrace$.
+* **Mechanism:** Each candidate $c_m$ is contextualized against the shared `CED` state prefix, pooled over valid tokens, and scored via centered Pearson/cosine similarity $s_m = \mathrm{sim}(z_{\mathrm{state}}, z_{c_m})$ with learned log-clamped scale $\tau = \exp(\mathrm{clamp}(\log \tau, \ln 0.1, \ln 100))$:
+
+$$
+p_m = \frac{\exp(\tau s_m)}{\sum_{k=1}^M \exp(\tau s_k)}
+$$
+
 * **Sub-Modes:**
   * **`Choice`:** Returns $\arg\max_m p_m$ and the full ranked distribution.
-  * **`Noul` (Boolean / Binary Event):** Returns $P(\text{true})$ over `{false_description, true_description}`.
+  * **`Noul` (Boolean / Binary Event):** Returns $P(\mathrm{true})$ over `{false_description, true_description}`.
   * **`Score` (Expected Level Utility):** Given ordered numeric levels $v_1 < v_2 < \dots < v_M$, returns the expectation $\hat{v} = \sum_{m=1}^M p_m v_m$.
 
 ### 3.3 `Evaluation` (Criterion-Conditioned Assessment)
-* **Purpose:** Score one or more candidate states/outputs against explicit criteria $K = \{k_1, \dots, k_C\}$ (e.g., `syntactic_validity`, `spec_compliance`, `minimal_diff`) without forcing candidates or criteria to compete in one softmax.
+* **Purpose:** Score one or more candidate states/outputs against explicit criteria $K = \lbrace k_1, \dots, k_C \rbrace$ (e.g., `syntactic_validity`, `spec_compliance`, `minimal_diff`) without forcing candidates or criteria to compete in one softmax.
 * **Mechanism:** Conditions the `CED` readout on `(candidate_m, criterion_c, evidence)` to produce normalized utility scores $U(m, c) \in [0, 1]$ per criterion.
 
 ### 3.4 `Deduction`, `Induction`, and `Abduction` (The Triadic Reasoning Operators)
@@ -85,9 +97,9 @@ Rather than treating "reasoning" as an amorphous blob of `<think>` text, `MCL4-C
 1. **`Deduction` (Rule + Premise $\to$ Necessary Conclusion):**
    * Given explicit premises $\mathcal{P}$, rules $\mathcal{R}$, and a candidate step/conclusion $q$, predicts the 3-way logical status in a single softmax: **`entailed` | `contradicted` | `undetermined`**, plus the supporting premise links via `Association`.
 2. **`Induction` (Observed Cases $\to$ Pattern & Generalization):**
-   * Given a set of observed input-output examples $\{x_i \to y_i\}$, pools the invariant relational structure across examples to predict the underlying rule or distribution over a held-out case $x_{\text{new}}$, paired with sample-size uncertainty.
+   * Given a set of observed input-output examples $\lbrace x_i \to y_i \rbrace$, pools the invariant relational structure across examples to predict the underlying rule or distribution over a held-out case $x_{\mathrm{new}}$, paired with sample-size uncertainty.
 3. **`Abduction` (Observed Evidence $\to$ Ranked Explanatory Hypotheses):**
-   * Given observations/symptoms $\mathcal{O}$ (e.g., a failing unit test or compiler traceback) and candidate hypotheses $\mathcal{H} = \{h_1, \dots, h_M\}$, uses `Association` + `Evaluation` to rank hypotheses by explanatory fit and identify the **most informative discriminating test/observation** to run next.
+   * Given observations/symptoms $\mathcal{O}$ (e.g., a failing unit test or compiler traceback) and candidate hypotheses $\mathcal{H} = \lbrace h_1, \dots, h_M \rbrace$, uses `Association` + `Evaluation` to rank hypotheses by explanatory fit and identify the **most informative discriminating test/observation** to run next.
 
 ### 3.5 `Abstraction` (Multi-Scale Compression Operator)
 * **Purpose:** Map a set of detailed items or trace steps to a requested level of abstraction (`brief`, `standard`, `detailed`)—either as a pooled latent summary vector injected into the next recurrence pass or as a compact `T$` text summary.
